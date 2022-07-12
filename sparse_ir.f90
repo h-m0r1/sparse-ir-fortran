@@ -495,17 +495,17 @@ module sparse_ir
         write(count_char,'(I10)') count
         write(pid_char,'(I10)') pid
 
-        filename='./mem_use.'//trim(count_char)
+        filename='./mem_use.'//trim(adjustl(count_char))
 
         command='cat /proc/'//trim(adjustl(pid_char))//'/status >'//trim(adjustl(filename))
 
         res=system(command)
 
-        command='cat '//trim(adjustl(filename))//' | grep RSS > ./rss_use.'//trim(count_char)
+        command='cat '//trim(adjustl(filename))//' | grep RSS > ./rss_use.'//trim(adjustl(count_char))
 
         res=system(command)
 
-        open(unit=100, file='./rss_use.'//trim(count_char))
+        open(unit=100, file='./rss_use.'//trim(adjustl(count_char)))
         read(100,*) dummy, valueRSS
         close(100)
 
