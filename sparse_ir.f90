@@ -501,11 +501,11 @@ module sparse_ir
 
         res=system(command)
 
-        command='cat '//trim(adjustl(filename))//' | grep RSS > ~/tmp/rss_use.'//trim(count_char)
+        command='cat '//trim(adjustl(filename))//' | grep RSS > ./rss_use.'//trim(count_char)
 
         res=system(command)
 
-        open(unit=100, file='~/tmp/rss_use.'//trim(count_char))
+        open(unit=100, file='./rss_use.'//trim(count_char))
         read(100,*) dummy, valueRSS
         close(100)
 
