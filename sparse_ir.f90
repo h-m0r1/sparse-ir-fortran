@@ -479,38 +479,46 @@ module sparse_ir
     end subroutine
     
     subroutine system_mem_usage(valueRSS)
+        implicit none
 #if defined (__INTEL)
         use ifport !if on intel compiler
 #endif
-        character(len=30) :: count_char,pid_char, dummy
-        character(len=200) :: filename
-        character(len=200) :: command
-        integer :: count,pid,res
-        character(len=50), intent(out) :: valueRSS
+        integer, intent(out) :: valueRSS
         
-        call sleep( 30 )
-        call system_clock(count)
-
+        character(len=200):: filename=' '
+        character(len=80) :: line
+        character(len=8)  :: pid_char=' '
+        integer :: pid
+        logical :: ifxst
+        
+        valueRSS=-1    ! return negative number if not found
+        
+        !--- get process ID
+        
         pid=getpid()
-
-        write(count_char,'(I10)') count
-        write(pid_char,'(I10)') pid
-
-        filename='./mem_use.'//trim(adjustl(count_char))
-
-        command='cat /proc/'//trim(adjustl(pid_char))//'/status >'//trim(adjustl(filename))
-
-        res=system(command)
-
-        command='cat '//trim(adjustl(filename))//' | grep RSS > ./rss_use.'//trim(adjustl(count_char))
-
-        res=system(command)
-
-        open(unit=100, file='./rss_use.'//trim(adjustl(count_char)))
-        read(100,*) dummy, valueRSS
+        write(pid_char,'(I8)') pid
+        filename='/proc/'//trim(adjustl(pid_char))//'/status'
+        
+        !--- read system file
+        
+        inquire (file=filename,exist=ifxst)
+        if (.not.ifxst) then
+          write (*,*) 'system file does not exist'
+          return
+        endif
+        
+        open(unit=100, file=filename, action='read')
+        do
+          read (100,'(a)',end=120) line
+          if (line(1:6).eq.'VmSize:') then
+             read (line(7:),*) valueRSS
+             exit
+          endif
+        enddo
+        120 continue
         close(100)
-
+        
         return
-    end subroutine
+    end subroutine system_mem_usage
 
 end module
