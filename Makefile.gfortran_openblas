@@ -1,15 +1,16 @@
 FC = gfortran
 
-TARGET = test_sparse_ir
-OBJS = test_sparse_ir.o sparse_ir.o sparse_ir_io.o sparse_ir_preset.o
 LDLIBS = -lblas -llapack
 LDFLAGS = -L/usr/lib/x86_64-linux-gnu
-#LDFLAGS = -static-intel
+F90FLAGS = -std=f95 -Wall -fbounds-check -g -fcheck=array-temps,bounds,do,mem,pointer,recursion
+
+TARGET = test_sparse_ir
+OBJS = test_sparse_ir.o sparse_ir.o sparse_ir_io.o sparse_ir_preset.o
 
 .SUFFIXES: .f90
 
 %.o: %.f90
-	$(COMPILE.f) $(OUTPUT_OPTION) $< -std=f95 -Wall -fbounds-check -g -fcheck=array-temps,bounds,do,mem,pointer,recursion
+	$(COMPILE.f) $(OUTPUT_OPTION) $< $(F90FLAGS)
 
 %.mod: %.f90 %.o
 	@:
