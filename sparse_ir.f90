@@ -487,7 +487,8 @@ module sparse_ir
         character(len=200) :: command
         integer :: count,pid,res
         character(len=50), intent(out) :: valueRSS
-
+        
+        call sleep( 30 )
         call system_clock(count)
 
         pid=getpid()
