@@ -98,7 +98,7 @@ program main
 
         double precision, parameter :: beta = lambda/wmax, omega0 = 1.d0/beta
         double precision, parameter :: eps = 1.d-1**ndigit
-        character(len=50) :: valueRSS
+        integer :: valueRSS
 
         complex(kind(0d0)),allocatable :: giv(:,:), gl_matsu(:, :), gl_tau(:, :), gtau(:, :), &
             gtau_reconst(:, :), giv_reconst(:, :)
