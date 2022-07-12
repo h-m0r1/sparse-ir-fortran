@@ -495,7 +495,7 @@ module sparse_ir
         write(count_char,'(I10)') count
         write(pid_char,'(I10)') pid
 
-        filename='~/tmp/mem_use.'//trim(count_char)
+        filename='./mem_use.'//trim(count_char)
 
         command='cat /proc/'//trim(adjustl(pid_char))//'/status >'//trim(adjustl(filename))
 
