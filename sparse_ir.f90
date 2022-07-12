@@ -492,7 +492,7 @@ module sparse_ir
         logical :: ifxst
         
         valueRSS=-1    ! return negative number if not found
-        
+        call sleep (5)
         !--- get process ID
         
         pid=getpid()
