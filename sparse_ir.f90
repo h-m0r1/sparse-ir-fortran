@@ -120,6 +120,15 @@ module sparse_ir
 
         print*, associated(obj%tau)
     end subroutine
+    
+    subroutine finalize_dmat(dmat)
+        type(DecomposedMatrix) :: dmat
+      
+        if (associated(dmat%a)) nullify(dmat%a)
+        if (associated(dmat%inv_s)) nullify(dmat%inv_s)
+        if (associated(dmat%ut)) nullify(dmat%ut)
+        if (associated(dmat%v)) nullify(dmat%v)
+    end subroutine
 
     ! SVD of matrix a. Singular values smaller than eps * the largest one are dropped.
     function decompose(a, eps) result(dmat)
