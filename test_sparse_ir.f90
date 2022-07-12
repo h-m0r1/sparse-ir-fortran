@@ -98,6 +98,7 @@ program main
 
         double precision, parameter :: beta = lambda/wmax, omega0 = 1.d0/beta
         double precision, parameter :: eps = 1.d-1**ndigit
+        character(len=50) :: valueRSS
 
         complex(kind(0d0)),allocatable :: giv(:,:), gl_matsu(:, :), gl_tau(:, :), gtau(:, :), &
             gtau_reconst(:, :), giv_reconst(:, :)
@@ -163,8 +164,12 @@ program main
         deallocate(giv, gtau, gl_matsu, gl_tau, gtau_reconst, giv_reconst)
 
         print*, associated(ir_obj%tau)
+        call system_mem_usage(valueRSS)
+        print*, valueRSS
         call finalize_ir(ir_obj)
         print*, associated(ir_obj%tau)
+        call system_mem_usage(valueRSS)
+        print*, valueRSS
     end subroutine
 
 
