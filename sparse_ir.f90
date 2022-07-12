@@ -99,22 +99,6 @@ module sparse_ir
         type(IR) :: obj
 
         print*, associated(obj%tau)
-        print*, allocated(obj%tau)
-        if (allocated(obj%x)) deallocate(obj%x)
-        if (allocated(obj%tau)) deallocate(obj%tau)
-        if (allocated(obj%s)) deallocate(obj%s)
-        if (allocated(obj%freq_f)) deallocate(obj%freq_f)
-        if (allocated(obj%freq_b)) deallocate(obj%freq_b)
-        if (allocated(obj%u_data)) deallocate(obj%u_data)
-        if (allocated(obj%uhat_f_data)) deallocate(obj%uhat_f_data)
-        if (allocated(obj%uhat_b_data)) deallocate(obj%uhat_b_data)
-        if (allocated(obj%y)) deallocate(obj%y)
-        if (allocated(obj%omega)) deallocate(obj%omega)
-        if (allocated(obj%v_data)) deallocate(obj%v_data)
-        if (allocated(obj%spr_data)) deallocate(obj%spr_data)
-
-        print*, associated(obj%tau)
-        print*, allocated(obj%tau)
         
         if (associated(obj%x)) nullify(obj%x)
         if (associated(obj%tau)) nullify(obj%tau)
@@ -135,7 +119,6 @@ module sparse_ir
         call finalize_dmat(obj%spr)
 
         print*, associated(obj%tau)
-        print*, allocated(obj%tau)
     end subroutine
 
     ! SVD of matrix a. Singular values smaller than eps * the largest one are dropped.
