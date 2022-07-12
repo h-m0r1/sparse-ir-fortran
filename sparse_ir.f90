@@ -479,10 +479,10 @@ module sparse_ir
     end subroutine
     
     subroutine system_mem_usage(valueRSS)
-        implicit none
 #if defined (__INTEL)
         use ifport !if on intel compiler
 #endif
+        implicit none
         integer, intent(out) :: valueRSS
         
         character(len=200):: filename=' '
