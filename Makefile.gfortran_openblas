@@ -2,7 +2,7 @@ FC = gfortran
 
 LDLIBS = -lblas -llapack
 LDFLAGS = -L/usr/lib/x86_64-linux-gnu
-F90FLAGS = -std=f95 -Wall -fbounds-check -g -fcheck=array-temps,bounds,do,mem,pointer,recursion -cpp
+F90FLAGS = -std=f08 -Wall -fbounds-check -g -fcheck=array-temps,bounds,do,mem,pointer,recursion -cpp
 
 TARGET = test_sparse_ir
 OBJS = test_sparse_ir.o sparse_ir.o sparse_ir_io.o sparse_ir_preset.o
