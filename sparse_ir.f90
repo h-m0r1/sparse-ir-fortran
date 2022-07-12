@@ -510,8 +510,8 @@ module sparse_ir
         open(unit=100, file=filename, action='read')
         do
           read (100,'(a)',end=120) line
-          if (line(1:7).eq.'VmSize:') then
-             read (line(8:),*) valueRSS
+          if (line(1:6).eq.'VmRSS:') then
+             read (line(7:),*) valueRSS
              exit
           endif
         enddo
