@@ -27,6 +27,7 @@ module sparse_ir_io
     function read_v1(unit, beta) result(obj)
         integer, intent (in) :: unit
         double precision, intent (in) :: beta
+        integer :: valueRSS
 
         type(IR) :: obj
 
@@ -128,7 +129,11 @@ module sparse_ir_io
 
         call init_ir(obj, beta, lambda, eps, s, tau, freq_f, freq_b, u, uhat_f, uhat_b, omega, v, spr, 1d-16)
 
+        call system_mem_usage(valueRSS)
+        print*, valueRSS
         deallocate(u, uhat_f, uhat_b, v, spr)
+        call system_mem_usage(valueRSS)
+        print*, valueRSS
     end function
 
 end module
