@@ -163,10 +163,8 @@ program main
         deallocate(giv, gtau, gl_matsu, gl_tau, gtau_reconst, giv_reconst)
 
         print*, associated(ir_obj%tau)
-        print*, allocated(ir_obj%tau)
         call finalize_ir(ir_obj)
         print*, associated(ir_obj%tau)
-        print*, allocated(ir_obj%tau)
     end subroutine
 
 
