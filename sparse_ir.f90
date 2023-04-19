@@ -1,4 +1,5 @@
 module sparse_ir
+    use sparse_ir_modules_orig
     implicit none
 
     ! Matrix decomposed in SVD for fitting
@@ -214,3 +215,5 @@ module sparse_ir
         if (allocated(dmat%ut_real)) deallocate(dmat%ut_real)
         if (allocated(dmat%v_real)) deallocate(dmat%v_real)
     end subroutine
+
+end module

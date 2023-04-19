@@ -941,3 +941,5 @@ subroutine fit_matsubara_b_zd(obj, arr, res)
     res(:, :) = real(res_tmp(:, :), kind(0d0)) 
     deallocate(ut_arr, arr_tmp)
 end subroutine
+
+end module

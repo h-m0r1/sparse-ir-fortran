@@ -1009,3 +1009,5 @@ subroutine fit_matsubara_b_zd(obj, arr, res)
 
     deallocate(ut_arr, ut_arr_tmp, arr_tmp)
 end subroutine
+
+end module
