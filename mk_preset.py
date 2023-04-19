@@ -103,9 +103,10 @@ f"""\
 """\
     contains
 
-    function mk_ir_preset(nlambda, ndigit, beta) result(obj)
+    function mk_ir_preset(nlambda, ndigit, beta, positive_only) result(obj)
         integer, intent(in) :: nlambda, ndigit
         double precision, intent(in) :: beta
+        logical, intent(in), optional :: positive_only
         type(IR) :: obj
 """)
 
@@ -114,7 +115,11 @@ f"""\
             print(
 f"""\
         if (nlambda == {nlambda} .and. ndigit == {ndigit}) then
-            obj = mk_nlambda{nlambda}_ndigit{ndigit}(beta)
+            if ((.not. present(positive_only))) then
+                obj = mk_nlambda{nlambda}_ndigit{ndigit}(beta)
+            else
+                obj = mk_nlambda{nlambda}_ndigit{ndigit}(beta, positive_only)
+            end if
             return
         end if
 """
@@ -139,10 +144,12 @@ def print_data(nlambda, ndigit, b):
     sig = f"nlambda{nlambda}_ndigit{ndigit}"
     print(
 f"""
-    function mk_nlambda{nlambda}_ndigit{ndigit}(beta) result(obj)
+    function mk_nlambda{nlambda}_ndigit{ndigit}(beta, positive_only) result(obj)
         double precision, intent(in) :: beta
+        logical, intent(in), optional :: positive_only
         type(IR) :: obj
-        complex(kind(0d0)), allocatable :: u(:, :), uhat_f(:, :), uhat_b(:, :), v(:, :), dlr(:, :)
+        double precision, allocatable :: u(:, :), v(:, :), dlr(:, :)
+        complex(kind(0d0)), allocatable :: uhat_f(:, :), uhat_b(:, :)
         integer, parameter :: size = {b.size}, ntau = {b.ntau}, nfreq_f = {b.nfreq_f}, nfreq_b = {b.nfreq_b}, nomega = {b.nomega}
         integer, parameter :: nlambda = {nlambda}, ndigit = {ndigit}
         integer, parameter :: ntau_reduced = ntau/2+1, nfreq_f_reduced = nfreq_f/2+1, nfreq_b_reduced = nfreq_b/2+1
@@ -215,11 +222,19 @@ f"""
             end do
         end do
 
-        call init_ir(obj, beta, lambda, eps,&
-            s_{sig}, tau_{sig},&
-            freq_f_{sig}, freq_b_{sig},&
-            u, uhat_f, uhat_b, omega_{sig},&
-            v, dlr, 1d-20)
+        if ((.not. present(positive_only))) then
+            call init_ir(obj, beta, lambda, eps,&
+                s_{sig}, tau_{sig},&
+                freq_f_{sig}, freq_b_{sig},&
+                u, uhat_f, uhat_b, omega_{sig},&
+                v, dlr, 1d-20)
+        else
+            call init_ir(obj, beta, lambda, eps,&
+                s_{sig}, tau_{sig},&
+                freq_f_{sig}, freq_b_{sig},&
+                u, uhat_f, uhat_b, omega_{sig},&
+                v, dlr, 1d-20, positive_only)
+        end if
 
         deallocate(u, uhat_f, uhat_b, v, dlr)
     end function

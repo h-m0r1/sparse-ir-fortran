@@ -66,9 +66,9 @@ module sparse_ir
         double precision, allocatable :: s(:), tau(:), x(:)
         double precision, allocatable :: omega(:), y(:)
         integer, allocatable :: freq_f(:), freq_b(:)
-        complex(kind(0d0)), allocatable :: u_data(:,:)
+        double precision, allocatable :: u_data(:,:)
         complex(kind(0d0)), allocatable :: uhat_f_data(:,:), uhat_b_data(:,:)
-        complex(kind(0d0)), allocatable :: v_data(:,:), dlr_data(:,:)
+        double precision, allocatable :: v_data(:,:), dlr_data(:,:)
         type(DecomposedMatrix_d) :: u
         type(DecomposedMatrix_z) :: uhat_f, uhat_b
         !type(DecomposedMatrix_d) :: dlr
@@ -80,7 +80,8 @@ module sparse_ir
     subroutine init_ir(obj, beta, lambda, eps, s, x, freq_f, freq_b, u, uhat_f, uhat_b, y, v, dlr, eps_svd, positive_only)
         type(IR), intent(inout) :: obj
         double precision, intent(in) :: beta, lambda, eps, s(:), x(:), y(:), eps_svd
-        complex(kind(0d0)), intent(in) :: u(:,:), uhat_f(:, :), uhat_b(:, :), v(:, :), dlr(:, :)
+        double precision, intent(in) :: u(:,:), v(:, :), dlr(:, :)
+        complex(kind(0d0)), intent(in) :: uhat_f(:, :), uhat_b(:, :)
         integer, intent(in) :: freq_f(:), freq_b(:)
         logical, intent(in), optional :: positive_only
 

@@ -47,10 +47,10 @@ program main
         PI =4.D0*DATAN(1.D0)
 
         if (preset) then
-            ir_obj = mk_ir_preset(nlambda, ndigit, beta)
+            ir_obj = mk_ir_preset(nlambda, ndigit, beta, positive_only)
         else
             open(99, file='ir_nlambda4_ndigit10.dat', status='old')
-            ir_obj = read_ir(99, beta)
+            ir_obj = read_ir(99, beta, positive_only)
             close(99)
         end if
 

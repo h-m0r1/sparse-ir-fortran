@@ -5,9 +5,10 @@ module sparse_ir_io
     contains
 
     ! Read sampling points, basis functions
-    function read_ir(unit, beta) result(obj)
+    function read_ir(unit, beta, positive_only) result(obj)
         integer, intent (in) :: unit
         double precision, intent (in) :: beta
+        logical, intent(in), optional :: positive_only
 
         type(IR) :: obj
         integer :: version
@@ -15,8 +16,11 @@ module sparse_ir_io
 
         read(unit,*) tmp_str, version
         if (version == 1) then
-            obj = read_v1(unit, beta)
-        else
+            if ((.not. present(positive_only))) then
+                obj = read_v1(unit, beta)
+            else
+                obj = read_v1(unit, beta, positive_only)
+            end if
             write(*, *) "Invalid version number", version
             stop "Stopping..."
         end if
@@ -27,6 +31,7 @@ module sparse_ir_io
     function read_v1(unit, beta) result(obj)
         integer, intent (in) :: unit
         double precision, intent (in) :: beta
+        logical, intent(in), optional :: positive_only
 
         type(IR) :: obj
 
@@ -39,9 +44,8 @@ module sparse_ir_io
         integer :: size, ntau, nfreq_f, nfreq_b, nomega
         double precision, allocatable :: s(:), tau(:), omega(:)
         integer, allocatable :: freq_f(:), freq_b(:)
-        complex(kind(0d0)), allocatable :: u(:, :)
+        double precision, allocatable :: u(:, :), v(:, :), dlr(:, :)
         complex(kind(0d0)), allocatable :: uhat_f(:, :), uhat_b(:, :)
-        complex(kind(0d0)), allocatable :: v(:, :), dlr(:, :)
 
         read(unit,*) tmp_str, lambda
         read(unit,*) tmp_str, eps
@@ -126,7 +130,11 @@ module sparse_ir_io
             end do
         end do
 
-        call init_ir(obj, beta, lambda, eps, s, tau, freq_f, freq_b, u, uhat_f, uhat_b, omega, v, dlr, 1d-16)
+        if ((.not. present(positive_only))) then
+            call init_ir(obj, beta, lambda, eps, s, tau, freq_f, freq_b, u, uhat_f, uhat_b, omega, v, dlr, 1d-16)
+        else
+            call init_ir(obj, beta, lambda, eps, s, tau, freq_f, freq_b, u, uhat_f, uhat_b, omega, v, dlr, 1d-16, positive_only)
+        end if
 
         deallocate(u, uhat_f, uhat_b, v, dlr)
     end function
