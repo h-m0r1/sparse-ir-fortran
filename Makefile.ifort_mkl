@@ -5,8 +5,8 @@ LDLIBS = -L${MKLROOT}/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -
 LDFLAGS = -static-intel
 F90FLAGS = -O2 -g -traceback
 
-TARGET = test_sparse_ir
-OBJS = test_sparse_ir.o sparse_ir.o sparse_ir_io.o sparse_ir_preset.o
+TARGET = test_sparse_ir_orig
+OBJS = test_sparse_ir_orig.o sparse_ir.o sparse_ir_io.o sparse_ir_modules_orig.o sparse_ir_preset.o
 
 .SUFFIXES: .f90
 
@@ -19,11 +19,11 @@ OBJS = test_sparse_ir.o sparse_ir.o sparse_ir_io.o sparse_ir_preset.o
 $(TARGET): $(OBJS)
 	$(LINK.f) $^ $(LDLIBS) $(LDFLAGS) -o $@
 
-test_sparse_ir.o: sparse_ir.mod sparse_ir_io.mod sparse_ir_preset.mod
+test_sparse_ir_orig.o: sparse_ir.mod sparse_ir_io.mod sparse_ir_modules_orig.mod sparse_ir_preset.mod
 
 .PHONY: test
 test: $(TARGET)
-	./test_sparse_ir
+	./test_sparse_ir_orig
 
 .PHONY: clean
 clean:
