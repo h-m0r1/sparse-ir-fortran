@@ -66,9 +66,9 @@ module sparse_ir2
         double precision, allocatable :: s(:), tau(:), x(:)
         double precision, allocatable :: omega(:), y(:)
         integer, allocatable :: freq_f(:), freq_b(:)
-        complex(kind(0d0)), allocatable :: u_data(:,:)
+        double precision, allocatable :: u_data(:,:)
         complex(kind(0d0)), allocatable :: uhat_f_data(:,:), uhat_b_data(:,:)
-        complex(kind(0d0)), allocatable :: v_data(:,:), dlr_data(:,:)
+        double precision, allocatable :: v_data(:,:), dlr_data(:,:)
         type(DecomposedMatrix_d) :: u
         type(DecomposedMatrix_z) :: uhat_f, uhat_b
         !type(DecomposedMatrix_d) :: dlr
@@ -80,7 +80,8 @@ module sparse_ir2
     subroutine init_ir(obj, beta, lambda, eps, s, x, freq_f, freq_b, u, uhat_f, uhat_b, y, v, dlr, eps_svd, positive_only)
         type(IR), intent(inout) :: obj
         double precision, intent(in) :: beta, lambda, eps, s(:), x(:), y(:), eps_svd
-        complex(kind(0d0)), intent(in) :: u(:,:), uhat_f(:, :), uhat_b(:, :), v(:, :), dlr(:, :)
+        double precision, intent(in) :: u(:,:), v(:, :), dlr(:, :)
+        complex(kind(0d0)), intent(in) :: uhat_f(:, :), uhat_b(:, :)
         integer, intent(in) :: freq_f(:), freq_b(:)
         logical, intent(in), optional :: positive_only
 
@@ -101,7 +102,7 @@ module sparse_ir2
             obj%nfreq_b = size(freq_b)
         else
             obj%nfreq_f = size(freq_f) / 2
-            obj%nfreq_b = size(freq_b - 1) / 2 + 1
+            obj%nfreq_b = (size(freq_b)-1) / 2 + 1
         end if
         obj%lambda = lambda
         obj%eps = eps
@@ -124,8 +125,8 @@ module sparse_ir2
             obj%freq_f = freq_f
             obj%freq_b = freq_b
         else
-            obj%freq_f = freq_f((size(freq_f) / 2):size(freq_f))
-            obj%freq_b = freq_b((size(freq_b - 1) / 2):size(freq_b))
+            obj%freq_f(1:obj%nfreq_f) = freq_f((size(freq_f) / 2 + 1):size(freq_f))
+            obj%freq_b(1:obj%nfreq_b) = freq_b(((size(freq_b) + 1) / 2):size(freq_b))
         end if
 
         allocate(obj%u_data(obj%ntau, obj%size))
@@ -139,8 +140,8 @@ module sparse_ir2
             obj%uhat_f_data = uhat_f
             obj%uhat_b_data = uhat_b
         else
-            obj%uhat_f_data = uhat_f((size(freq_f) / 2):size(freq_f), :)
-            obj%uhat_b_data = uhat_b((size(freq_b - 1) / 2):size(freq_b), :)
+            obj%uhat_f_data(1:obj%nfreq_f, :) = uhat_f((size(freq_f) / 2 + 1):size(freq_f), :)
+            obj%uhat_b_data(1:obj%nfreq_b, :) = uhat_b(((size(freq_b) + 1) / 2):size(freq_b), :)
         end if
 
         allocate(obj%y(obj%nomega))
@@ -154,7 +155,7 @@ module sparse_ir2
         allocate(obj%dlr_data(obj%size, obj%nomega))
         obj%dlr_data = transpose(dlr)
 
-        obj%u = decompose(obj%u_data, obj%eps_svd)
+        obj%u = decompose(obj%u_data, obj%eps_svd, .false.)
         if (.not. obj%positive_only) then
             obj%uhat_f = decompose(obj%uhat_f_data, obj%eps_svd, .false.)
             obj%uhat_b = decompose(obj%uhat_b_data, obj%eps_svd, .false.)
@@ -162,10 +163,6 @@ module sparse_ir2
             obj%uhat_f = split_decompose(obj%uhat_f_data, .false., obj%eps_svd, .false.)
             obj%uhat_b = split_decompose(obj%uhat_b_data, .true., obj%eps_svd, .false.)
         end if
-        obj%uhat_f%a_odd(:, :) = obj%uhat_f%a_imag(:, 1:(obj%uhat_f%n - 1):2)
-        obj%uhat_f%a_even(:, :) = obj%uhat_f%a_real(:, 2:obj%uhat_f%n:2)
-        obj%uhat_b%a_odd(:, :) = obj%uhat_b%a_real(:, 1:(obj%uhat_b%n - 1):2)
-        obj%uhat_b%a_even(:, :) = obj%uhat_b%a_imag(:, 2:obj%uhat_b%n:2)
 
         !obj%dlr = decompose(obj%dlr_data, obj%eps_svd, .true.)
 
@@ -183,10 +180,20 @@ module sparse_ir2
         obj%tau = 5.0d-1 * beta * (obj%x + 1.d0)
         obj%omega = obj%y * obj%wmax
 
-        obj%u%a(:, :) = sqrt(2.0d0/beta)*obj%u_data(:, :)
+        obj%u%a_real(:, :) = sqrt(2.0d0/beta)*obj%u_data(:, :)
         obj%uhat_f%a(:, :) = sqrt(beta) * obj%uhat_f_data(:, :)
         obj%uhat_b%a(:, :) = sqrt(beta) * obj%uhat_b_data(:, :)
         !obj%dlr%a(:, :) = sqrt(5.0d-1*beta)*obj%dlr_data(:, :)
+
+        obj%u%a = cmplx(obj%u%a_real, zero, kind(0d0))
+        obj%uhat_f%a_real = REAL(obj%uhat_f%a, KIND(0d0))
+        obj%uhat_f%a_imag = AIMAG(obj%uhat_f%a)
+        obj%uhat_b%a_real = REAL(obj%uhat_b%a, KIND(0d0))
+        obj%uhat_b%a_imag = AIMAG(obj%uhat_b%a)
+        obj%uhat_f%a_odd(:, :) = obj%uhat_f%a_imag(:, 1:(obj%uhat_f%n - 1):2)
+        obj%uhat_f%a_even(:, :) = obj%uhat_f%a_real(:, 2:obj%uhat_f%n:2)
+        obj%uhat_b%a_odd(:, :) = obj%uhat_b%a_real(:, 1:(obj%uhat_b%n - 1):2)
+        obj%uhat_b%a_even(:, :) = obj%uhat_b%a_imag(:, 2:obj%uhat_b%n:2)
 
         obj%u%inv_s(:) = sqrt(5.0d-1*beta) * obj%u%inv_s_dl(:)
         obj%uhat_f%inv_s(:) = (1.0d0 / sqrt(beta)) * obj%uhat_f%inv_s_dl(:)
@@ -211,10 +218,10 @@ module sparse_ir2
         if (allocated(obj%v_data)) deallocate(obj%v_data)
         if (allocated(obj%dlr_data)) deallocate(obj%dlr_data)
     
-        call finalize_dmat(obj%u)
-        call finalize_dmat(obj%uhat_f)
-        call finalize_dmat(obj%uhat_b)
-        !call finalize_dmat(obj%dlr)
+        call finalize_dmat_d(obj%u)
+        call finalize_dmat_z(obj%uhat_f)
+        call finalize_dmat_z(obj%uhat_b)
+        !call finalize_dmat_d(obj%dlr)
     end subroutine
 
     subroutine finalize_dmat_z(dmat)
@@ -346,8 +353,7 @@ module sparse_ir2
       
         integer :: i, info, lda, ldu, ldvt, lwork, m, n, mn, ns
         double precision, allocatable :: a_copy(:, :), u(:, :), &
-            vt(:, :), work(:)
-        double precision, allocatable :: rwork(:), s(:)
+            vt(:, :), work(:), s(:)
         integer, allocatable :: iwork(:)
         type(DecomposedMatrix_d)::dmat
       
@@ -362,23 +368,23 @@ module sparse_ir2
         ldu = m
         ldvt = n
         if (.not. ill_conditioned) then
-            lwork = mn*mn + 3*mn
-            allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n), rwork((5*mn+7)*mn), iwork(8*mn))
+            lwork = 4*mn*mn + 7*mn
+            allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n), iwork(8*mn))
         else
-            lwork = 2*mn + m + n
-            allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n), rwork(5*n))
+            lwork = 5*mn + m + n
+            allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n))
         endif
       
         a_copy(1:m, 1:n) = a(1:m, 1:n)
         if (.not. ill_conditioned) then
-            lwork = mn*mn + 3*mn
-            call dgesdd('S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, rwork, iwork, info)
+            lwork = 4*mn*mn + 7*mn
+            call dgesdd('S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, iwork, info)
             if (info /= 0) then
                 stop 'Failure in DGESDD.'
             end if
         else
-            lwork = 2*mn + m + n
-            call dgesvd('S', 'S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, rwork, info)
+            lwork = 5*mn + m + n
+            call dgesvd('S', 'S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, info)
             if (info /= 0) then
                 stop 'Failure in DGESVD.'
             end if
@@ -407,8 +413,8 @@ module sparse_ir2
         dmat%inv_s_dl(1:ns) = 1.0D0 / s(1:ns)
         ! inv_s temporarily stores the same data of inv_s_dl
         dmat%inv_s(1:ns) = dmat%inv_s_dl(1:ns)
-        dmat%ut_real(1:ns, 1:m) = (transpose(u(1:m, 1:ns)))
-        dmat%v_real(1:n, 1:ns) = (transpose(vt(1:ns, 1:n)))
+        dmat%ut_real(1:ns, 1:m) = transpose(u(1:m, 1:ns))
+        dmat%v_real(1:n, 1:ns) = transpose(vt(1:ns, 1:n))
         dmat%m = size(a, 1)
         dmat%n = size(a, 2)
         dmat%ns = ns
@@ -418,9 +424,9 @@ module sparse_ir2
         dmat%v = dmat%v_real
       
         if (.not. ill_conditioned) then
-            deallocate(work, a_copy, s, u, vt, rwork, iwork)
+            deallocate(work, a_copy, s, u, vt, iwork)
         else
-            deallocate(work, a_copy, s, u, vt, rwork)
+            deallocate(work, a_copy, s, u, vt)
         endif
     end function
     
@@ -432,9 +438,8 @@ module sparse_ir2
       
         integer :: i, info, lda, ldu, ldvt, lwork, m, n, mn, ns, m_half
         double precision, allocatable :: a_copy(:, :), u(:, :), &
-            vt(:, :), work(:)
-        complex(kind(0d0)) :: u_copy(:, :)
-        double precision, allocatable :: rwork(:), s(:)
+            vt(:, :), work(:), s(:)
+        complex(kind(0d0)), allocatable :: u_copy(:, :)
         integer, allocatable :: iwork(:)
         type(DecomposedMatrix_z)::dmat
       
@@ -455,30 +460,30 @@ module sparse_ir2
         ldu = m
         ldvt = n
         if (.not. ill_conditioned) then
-            lwork = mn*mn + 3*mn
-            allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n), rwork((5*mn+7)*mn), iwork(8*mn))
+            lwork = 4*mn*mn + 7*mn
+            allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n), iwork(8*mn))
         else
-            lwork = 2*mn + m + n
-            allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n), rwork(5*n))
-        end if
+            lwork = 5*mn + m + n
+            allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n))
+        endif
     
         a_copy(1:m_half, 1:n) = real(a(1:m_half, 1:n))
     
         if (has_zero) then
-            a_copy(m_half+1:m, 1:n) = aimag(a(2:m, 1:n))
+            a_copy(m_half+1:m, 1:n) = aimag(a(2:m_half, 1:n))
         else
-            a_copy(m_half+1:m, 1:n) = aimag(a(1:m, 1:n))
+            a_copy(m_half+1:m, 1:n) = aimag(a(1:m_half, 1:n))
         end if
     
         if (.not. ill_conditioned) then
-            lwork = mn*mn + 3*mn
-            call dgesdd('S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, rwork, iwork, info)
+            lwork = 4*mn*mn + 7*mn
+            call dgesdd('S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, iwork, info)
             if (info /= 0) then
                 stop 'Failure in DGESDD.'
             end if
         else
-            lwork = 2*mn + m + n
-            call dgesvd('S', 'S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, rwork, info)
+            lwork = 5*mn + m + n
+            call dgesvd('S', 'S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, info)
             if (info /= 0) then
                 stop 'Failure in DGESVD.'
             end if
@@ -502,27 +507,27 @@ module sparse_ir2
             u_copy(1:m_half, 1:ns) = cmplx(u(1:m_half, 1:ns), u(m_half+1:m, 1:ns), kind(0d0))
         end if
     
-        allocate(dmat%a(m, n))
-        allocate(dmat%a_real(m, n))
-        allocate(dmat%a_imag(m, n))
+        allocate(dmat%a(m_half, n))
+        allocate(dmat%a_real(m_half, n))
+        allocate(dmat%a_imag(m_half, n))
         allocate(dmat%inv_s_dl(ns))
         allocate(dmat%inv_s(ns))
-        allocate(dmat%ut(ns, m))
-        allocate(dmat%ut_real(ns, m))
-        allocate(dmat%ut_imag(ns, m))
+        allocate(dmat%ut(ns, m_half))
+        allocate(dmat%ut_real(ns, m_half))
+        allocate(dmat%ut_imag(ns, m_half))
         allocate(dmat%v(n, ns))
         allocate(dmat%v_real(n, ns))
-        allocate(dmat%v_imag(ns, m))
-        allocate(dmat%a_odd(m, n/2))
-        allocate(dmat%a_even(m, n/2))
+        allocate(dmat%v_imag(n, ns))
+        allocate(dmat%a_odd(m_half, n/2))
+        allocate(dmat%a_even(m_half, n/2))
       
         ! dmat%a temporarily stores the same data of input a
         dmat%a = a
         dmat%inv_s_dl(1:ns) = 1.0D0 / s(1:ns)
         ! inv_s temporarily stores the same data of inv_s_dl
         dmat%inv_s(1:ns) = dmat%inv_s_dl(1:ns)
-        dmat%ut(1:ns, 1:m) = (transpose(u_copy(1:m, 1:ns)))
-        dmat%v_real(1:n, 1:ns) = (transpose(vt(1:ns, 1:n)))
+        dmat%ut(1:ns, 1:m_half) = conjg(transpose(u_copy(1:m_half, 1:ns)))
+        dmat%v_real(1:n, 1:ns) = transpose(vt(1:ns, 1:n))
         dmat%m = size(a, 1)
         dmat%n = size(a, 2)
         dmat%ns = ns
@@ -537,9 +542,9 @@ module sparse_ir2
         dmat%v = cmplx(dmat%v_real, zero, kind(0d0))
       
         if (.not. ill_conditioned) then
-            deallocate(work, a_copy, s, u, vt, rwork, iwork)
+            deallocate(work, a_copy, s, u, vt, iwork, u_copy)
         else
-            deallocate(work, a_copy, s, u, vt, rwork)
+            deallocate(work, a_copy, s, u, vt, u_copy)
         endif
     end function
     
@@ -1055,7 +1060,7 @@ module sparse_ir2
     
         ! ut_arr(ns, l1) * v(n, ns) -> res(l2, n)
         res_tmp(:, :) = zero
-        call dgemm("t", "t", l1, n, ns, one, ut_arr, ns, obj%u%v, n, zero, res, l2)
+        call dgemm("t", "t", l1, n, ns, one, ut_arr, ns, obj%u%v, n, zero, res_tmp, l2)
     
         res(:, :) = cmplx(res_tmp(:, :), zero, kind(0d0)) 
         deallocate(ut_arr, res_tmp)
@@ -1149,6 +1154,10 @@ module sparse_ir2
         complex(kind(0d0)), intent (in) :: arr(:, :)
         complex(kind(0d0)), intent(out) :: res(:, :)
         complex(kind(0d0)), allocatable :: ut_arr(:, :)
+        double precision, allocatable :: arr_tmp(:, :)
+        double precision, allocatable :: res_tmp(:, :)
+        double precision, allocatable :: ut_arr_r(:, :)
+        double precision, allocatable :: ut_arr_tmp(:, :)
     
         integer :: m, n, l1, l2, ns, i, j
     
@@ -1166,24 +1175,55 @@ module sparse_ir2
         IF (l1 .NE. l2) stop 'wrong number of rows of input array.'
         IF (m .NE. obj%uhat_f%m) stop 'wrong number of columns of input array.'
         IF (n .NE. obj%uhat_f%n) stop 'wrong number of columns of output array.'
-        allocate(ut_arr(ns, l1))
-    
-        !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
-        ut_arr(:, :) = czero
-        call zgemm("n", "t", ns, l1, m, cone, obj%uhat_f%ut, ns, arr, l1, czero, ut_arr, ns)
-        do j = 1, ns
-            do i = 1, l1
-                ut_arr(j, i) = ut_arr(j, i) * obj%uhat_f%inv_s(j)
+        
+        IF (.not. obj%positive_only) then
+            allocate(ut_arr(ns, l1))
+            !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
+            ut_arr(:, :) = czero
+            call zgemm("n", "t", ns, l1, m, cone, obj%uhat_f%ut, ns, arr, l1, czero, ut_arr, ns)
+            do j = 1, ns
+                do i = 1, l1
+                    ut_arr(j, i) = ut_arr(j, i) * obj%uhat_f%inv_s(j)
+                end do
             end do
-        end do
     
-        ! ut_arr(ns, l1) * v(n, ns) -> res(l2, n)
-        res(:, :) = czero
-        call zgemm("t", "t", l1, n, ns, cone, ut_arr, ns, obj%uhat_f%v, n, czero, res, l2)
+            ! ut_arr(ns, l1) * v(n, ns) -> res(l2, n)
+            res(:, :) = czero
+            call zgemm("t", "t", l1, n, ns, cone, ut_arr, ns, obj%uhat_f%v, n, czero, res, l2)
+            deallocate(ut_arr)
+        ELSE
+            allocate(arr_tmp(l1, m))
+            allocate(res_tmp(l2, n))
+            allocate(ut_arr_r(ns, l1))
+            allocate(ut_arr_tmp(ns, l1))
+            arr_tmp(:, :) = real(arr(:, :), kind(0d0))
+            !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
+            ut_arr_r(:, :) = zero
+            call dgemm("n", "t", ns, l1, m, one, obj%uhat_f%ut_real, ns, arr_tmp, l1, zero, ut_arr_r, ns)
+        
+            arr_tmp(:, :) = aimag(arr(:, :))
+            !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
+            ut_arr_tmp(:, :) = zero
+            call dgemm("n", "t", ns, l1, m, one, obj%uhat_f%ut_imag, ns, arr_tmp, l1, zero, ut_arr_tmp, ns)
+        
+            ut_arr_r(:, :) = ut_arr_r(:, :) + ut_arr_tmp(:, :)
+            do j = 1, ns
+                do i = 1, l1
+                    ut_arr_r(j, i) = ut_arr_r(j, i) * obj%uhat_f%inv_s(j)
+                end do
+            end do
+        
+            ! ut_arr(ns, l1) * v(n, ns) -> res(l2, n)
+            res_tmp(:, :) = zero
+            call dgemm("t", "t", l1, n, ns, one, ut_arr_r, ns, obj%uhat_f%v_real, n, zero, res_tmp, l2)
+
+            res = cmplx(res_tmp, zero, kind(0d0))
+        
+            deallocate(ut_arr_r, ut_arr_tmp, arr_tmp, res_tmp)
+        ENDIF
     
-        deallocate(ut_arr)
     end subroutine
-    
+
     subroutine fit_matsubara_f_zd(obj, arr, res)
         type(IR), intent(in) :: obj
         complex(kind(0d0)), intent (in) :: arr(:, :)
@@ -1208,7 +1248,7 @@ module sparse_ir2
         IF (l1 .NE. l2) stop 'wrong number of rows of input array.'
         IF (m .NE. obj%uhat_f%m) stop 'wrong number of columns of input array.'
         IF (n .NE. obj%uhat_f%n) stop 'wrong number of columns of output array.'
-        IF (.not. obj%positive_only) stop 'input array should be a complex array.'
+        IF (.not. obj%positive_only) stop 'output array should be a complex array.'
         allocate(arr_tmp(l1, m))
         allocate(ut_arr(ns, l1))
         allocate(ut_arr_tmp(ns, l1))
@@ -1217,36 +1257,35 @@ module sparse_ir2
         !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
         ut_arr(:, :) = zero
         call dgemm("n", "t", ns, l1, m, one, obj%uhat_f%ut_real, ns, arr_tmp, l1, zero, ut_arr, ns)
+    
+        arr_tmp(:, :) = aimag(arr(:, :))
+        !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
+        ut_arr_tmp(:, :) = zero
+        call dgemm("n", "t", ns, l1, m, one, obj%uhat_f%ut_imag, ns, arr_tmp, l1, zero, ut_arr_tmp, ns)
+    
+        ut_arr(:, :) = ut_arr(:, :) + ut_arr_tmp(:, :)
         do j = 1, ns
             do i = 1, l1
                 ut_arr(j, i) = ut_arr(j, i) * obj%uhat_f%inv_s(j)
             end do
         end do
     
-        arr_tmp(:, :) = aimag(arr(:, :))
-        !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
-        ut_arr_tmp(:, :) = zero
-        call dgemm("n", "t", ns, l1, m, one, obj%uhat_f%ut_imag, ns, arr_tmp, l1, zero, ut_arr_tmp, ns)
-        do j = 1, ns
-            do i = 1, l1
-                ut_arr_tmp(j, i) = ut_arr_tmp(j, i) * obj%uhat_f%inv_s(j)
-            end do
-        end do
-    
-        ut_arr(:, :) = ut_arr(:, :) + ut_arr_tmp(:, :)
-    
         ! ut_arr(ns, l1) * v(n, ns) -> res(l2, n)
-        res_tmp(:, :) = czero
+        res(:, :) = zero
         call dgemm("t", "t", l1, n, ns, one, ut_arr, ns, obj%uhat_f%v_real, n, zero, res, l2)
     
         deallocate(ut_arr, ut_arr_tmp, arr_tmp)
     end subroutine
-    
+
     subroutine fit_matsubara_b_zz(obj, arr, res)
         type(IR), intent(in) :: obj
         complex(kind(0d0)), intent (in) :: arr(:, :)
         complex(kind(0d0)), intent(out) :: res(:, :)
         complex(kind(0d0)), allocatable :: ut_arr(:, :)
+        double precision, allocatable :: arr_tmp(:, :)
+        double precision, allocatable :: res_tmp(:, :)
+        double precision, allocatable :: ut_arr_r(:, :)
+        double precision, allocatable :: ut_arr_tmp(:, :)
     
         integer :: m, n, l1, l2, ns, i, j
     
@@ -1264,24 +1303,55 @@ module sparse_ir2
         IF (l1 .NE. l2) stop 'wrong number of rows of input array.'
         IF (m .NE. obj%uhat_b%m) stop 'wrong number of columns of input array.'
         IF (n .NE. obj%uhat_b%n) stop 'wrong number of columns of output array.'
-        allocate(ut_arr(ns, l1))
-    
-        !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
-        ut_arr(:, :) = czero
-        call zgemm("n", "t", ns, l1, m, cone, obj%uhat_b%ut, ns, arr, l1, czero, ut_arr, ns)
-        do j = 1, ns
-            do i = 1, l1
-                ut_arr(j, i) = ut_arr(j, i) * obj%uhat_b%inv_s(j)
+        
+        IF (.not. obj%positive_only) then
+            allocate(ut_arr(ns, l1))
+            !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
+            ut_arr(:, :) = czero
+            call zgemm("n", "t", ns, l1, m, cone, obj%uhat_b%ut, ns, arr, l1, czero, ut_arr, ns)
+            do j = 1, ns
+                do i = 1, l1
+                    ut_arr(j, i) = ut_arr(j, i) * obj%uhat_b%inv_s(j)
+                end do
             end do
-        end do
     
-        ! ut_arr(ns, l1) * v(n, ns) -> res(l2, n)
-        res(:, :) = czero
-        call zgemm("t", "t", l1, n, ns, cone, ut_arr, ns, obj%uhat_b%v, n, czero, res, l2)
+            ! ut_arr(ns, l1) * v(n, ns) -> res(l2, n)
+            res(:, :) = czero
+            call zgemm("t", "t", l1, n, ns, cone, ut_arr, ns, obj%uhat_b%v, n, czero, res, l2)
+            deallocate(ut_arr)
+        ELSE
+            allocate(arr_tmp(l1, m))
+            allocate(res_tmp(l2, n))
+            allocate(ut_arr_r(ns, l1))
+            allocate(ut_arr_tmp(ns, l1))
+            arr_tmp(:, :) = real(arr(:, :), kind(0d0))
+            !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
+            ut_arr_r(:, :) = zero
+            call dgemm("n", "t", ns, l1, m, one, obj%uhat_b%ut_real, ns, arr_tmp, l1, zero, ut_arr_r, ns)
+        
+            arr_tmp(:, :) = aimag(arr(:, :))
+            !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
+            ut_arr_tmp(:, :) = zero
+            call dgemm("n", "t", ns, l1, m, one, obj%uhat_b%ut_imag, ns, arr_tmp, l1, zero, ut_arr_tmp, ns)
+        
+            ut_arr_r(:, :) = ut_arr_r(:, :) + ut_arr_tmp(:, :)
+            do j = 1, ns
+                do i = 1, l1
+                    ut_arr_r(j, i) = ut_arr_r(j, i) * obj%uhat_b%inv_s(j)
+                end do
+            end do
+        
+            ! ut_arr(ns, l1) * v(n, ns) -> res(l2, n)
+            res_tmp(:, :) = zero
+            call dgemm("t", "t", l1, n, ns, one, ut_arr_r, ns, obj%uhat_b%v_real, n, zero, res_tmp, l2)
+
+            res = cmplx(res_tmp, zero, kind(0d0))
+        
+            deallocate(ut_arr_r, ut_arr_tmp, arr_tmp, res_tmp)
+        ENDIF
     
-        deallocate(ut_arr)
     end subroutine
-    
+
     subroutine fit_matsubara_b_zd(obj, arr, res)
         type(IR), intent(in) :: obj
         complex(kind(0d0)), intent (in) :: arr(:, :)
@@ -1306,7 +1376,7 @@ module sparse_ir2
         IF (l1 .NE. l2) stop 'wrong number of rows of input array.'
         IF (m .NE. obj%uhat_b%m) stop 'wrong number of columns of input array.'
         IF (n .NE. obj%uhat_b%n) stop 'wrong number of columns of output array.'
-        IF (.not. obj%positive_only) stop 'input array should be a complex array.'
+        IF (.not. obj%positive_only) stop 'output array should be a complex array.'
         allocate(arr_tmp(l1, m))
         allocate(ut_arr(ns, l1))
         allocate(ut_arr_tmp(ns, l1))
@@ -1315,26 +1385,21 @@ module sparse_ir2
         !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
         ut_arr(:, :) = zero
         call dgemm("n", "t", ns, l1, m, one, obj%uhat_b%ut_real, ns, arr_tmp, l1, zero, ut_arr, ns)
+    
+        arr_tmp(:, :) = aimag(arr(:, :))
+        !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
+        ut_arr_tmp(:, :) = zero
+        call dgemm("n", "t", ns, l1, m, one, obj%uhat_b%ut_imag, ns, arr_tmp, l1, zero, ut_arr_tmp, ns)
+    
+        ut_arr(:, :) = ut_arr(:, :) + ut_arr_tmp(:, :)
         do j = 1, ns
             do i = 1, l1
                 ut_arr(j, i) = ut_arr(j, i) * obj%uhat_b%inv_s(j)
             end do
         end do
     
-        arr_tmp(:, :) = aimag(arr(:, :))
-        !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
-        ut_arr_tmp(:, :) = zero
-        call dgemm("n", "t", ns, l1, m, one, obj%uhat_b%ut_imag, ns, arr_tmp, l1, zero, ut_arr_tmp, ns)
-        do j = 1, ns
-            do i = 1, l1
-                ut_arr_tmp(j, i) = ut_arr_tmp(j, i) * obj%uhat_b%inv_s(j)
-            end do
-        end do
-    
-        ut_arr(:, :) = ut_arr(:, :) + ut_arr_tmp(:, :)
-    
         ! ut_arr(ns, l1) * v(n, ns) -> res(l2, n)
-        res_tmp(:, :) = czero
+        res(:, :) = zero
         call dgemm("t", "t", l1, n, ns, one, ut_arr, ns, obj%uhat_b%v_real, n, zero, res, l2)
     
         deallocate(ut_arr, ut_arr_tmp, arr_tmp)

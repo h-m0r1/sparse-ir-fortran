@@ -992,7 +992,7 @@ module sparse_ir
         IF (l1 .NE. l2) stop 'wrong number of rows of input array.'
         IF (m .NE. obj%uhat_f%m) stop 'wrong number of columns of input array.'
         IF (n .NE. obj%uhat_f%n) stop 'wrong number of columns of output array.'
-        IF (.not. obj%positive_only) stop 'input array should be a complex array.'
+        IF (.not. obj%positive_only) stop 'output array should be a complex array.'
         allocate(res_tmp(l2, n))
         allocate(ut_arr(ns, l1))
     
@@ -1082,7 +1082,7 @@ module sparse_ir
         IF (l1 .NE. l2) stop 'wrong number of rows of input array.'
         IF (m .NE. obj%uhat_b%m) stop 'wrong number of columns of input array.'
         IF (n .NE. obj%uhat_b%n) stop 'wrong number of columns of output array.'
-        IF (.not. obj%positive_only) stop 'input array should be a complex array.'
+        IF (.not. obj%positive_only) stop 'output array should be a complex array.'
         allocate(res_tmp(l2, n))
         allocate(ut_arr(ns, l1))
     
