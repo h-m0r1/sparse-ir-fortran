@@ -98,10 +98,10 @@ program main
         end if
 
         if (lflag_gl) then
-            do l = 1, ir_obj%size
-                write(*,*) gl_matsu_d(1,l)
-                write(*,*) gl_tau_d(1,l)
-            end do
+            !do l = 1, ir_obj%size
+            !    write(*,*) gl_matsu_d(1,l)
+            !    write(*,*) gl_tau_d(1,l)
+            !end do
             write(*,*) maxval(abs(gl_matsu_d - gl_tau_d))
             if (maxval(abs(gl_matsu_d - gl_tau_d)) > 1d2*eps) then
                 write(*,*) maxval(abs(gl_matsu_d - gl_tau_d))
@@ -109,10 +109,10 @@ program main
                 stop 1
             end if
         else
-            do l = 1, ir_obj%size
-                write(*,*) real(gl_matsu(1,l)), aimag(gl_matsu(1,l))
-                write(*,*) real(gl_tau(1,l)), aimag(gl_tau(1,l))
-            end do
+            !do l = 1, ir_obj%size
+            !    write(*,*) real(gl_matsu(1,l)), aimag(gl_matsu(1,l))
+            !    write(*,*) real(gl_tau(1,l)), aimag(gl_tau(1,l))
+            !end do
             write(*,*) maxval(abs(gl_matsu - gl_tau))
             if (maxval(abs(gl_matsu - gl_tau)) > 1d2*eps) then
                 write(*,*) "gl_matsu and gl_tau do not match!"
@@ -124,10 +124,10 @@ program main
         else
             call evaluate_matsubara_f(ir_obj, gl_matsu, giv_reconst)
         end if
-        do n = 1, ir_obj%nfreq_f
-            write(*,*) giv(1,n)
-            write(*,*) giv_reconst(1,n)
-        end do
+        !do n = 1, ir_obj%nfreq_f
+        !    write(*,*) giv(1,n)
+        !    write(*,*) giv_reconst(1,n)
+        !end do
         if (maxval(abs(giv - giv_reconst)) > 1d2*eps) then
             write(*,*) "giv do not match!"
             stop 1
@@ -144,10 +144,10 @@ program main
             call evaluate_tau(ir_obj, gl_tau, gtau_reconst)
             gtau_reconst_d = real(gtau_reconst, kind(0d0))
         end if
-        do n = 1, ir_obj%ntau
-            write(*,*) gtau_d(1,n)
-            write(*,*) gtau_reconst_d(1,n)
-        end do
+        !do n = 1, ir_obj%ntau
+        !    write(*,*) gtau_d(1,n)
+        !    write(*,*) gtau_reconst_d(1,n)
+        !end do
         if (maxval(abs(gtau_d - gtau_reconst_d)) > 1d2*eps) then
             write(*,*) "gtau do not match!"
             stop 1
@@ -247,10 +247,10 @@ program main
         end if
 
         if (lflag_gl) then
-            do l = 1, ir_obj%size
-                write(*,*) gl_matsu_d(1,l)
-                write(*,*) gl_tau_d(1,l)
-            end do
+            !do l = 1, ir_obj%size
+            !    write(*,*) gl_matsu_d(1,l)
+            !    write(*,*) gl_tau_d(1,l)
+            !end do
             write(*,*) maxval(abs(gl_matsu_d - gl_tau_d))
             if (maxval(abs(gl_matsu_d - gl_tau_d)) > 1d2*eps) then
                 write(*,*) maxval(abs(gl_matsu_d - gl_tau_d))
@@ -258,10 +258,10 @@ program main
                 stop 1
             end if
         else
-            do l = 1, ir_obj%size
-                write(*,*) real(gl_matsu(1,l)), aimag(gl_matsu(1,l))
-                write(*,*) real(gl_tau(1,l)), aimag(gl_tau(1,l))
-            end do
+            !do l = 1, ir_obj%size
+            !    write(*,*) real(gl_matsu(1,l)), aimag(gl_matsu(1,l))
+            !    write(*,*) real(gl_tau(1,l)), aimag(gl_tau(1,l))
+            !end do
             write(*,*) maxval(abs(gl_matsu - gl_tau))
             if (maxval(abs(gl_matsu - gl_tau)) > 1d2*eps) then
                 write(*,*) "gl_matsu and gl_tau do not match!"
@@ -273,10 +273,10 @@ program main
         else
             call evaluate_matsubara_b(ir_obj, gl_matsu, giv_reconst)
         end if
-        do n = 1, ir_obj%nfreq_f
-            write(*,*) giv(1,n)
-            write(*,*) giv_reconst(1,n)
-        end do
+        !do n = 1, ir_obj%nfreq_f
+        !    write(*,*) giv(1,n)
+        !    write(*,*) giv_reconst(1,n)
+        !end do
         if (maxval(abs(giv - giv_reconst)) > 1d2*eps) then
             write(*,*) "giv do not match!"
             stop 1
@@ -293,10 +293,10 @@ program main
             call evaluate_tau(ir_obj, gl_tau, gtau_reconst)
             gtau_reconst_d = real(gtau_reconst, kind(0d0))
         end if
-        do n = 1, ir_obj%ntau
-            write(*,*) gtau_d(1,n)
-            write(*,*) gtau_reconst_d(1,n)
-        end do
+        !do n = 1, ir_obj%ntau
+        !    write(*,*) gtau_d(1,n)
+        !    write(*,*) gtau_reconst_d(1,n)
+        !end do
         if (maxval(abs(gtau_d - gtau_reconst_d)) > 1d2*eps) then
             write(*,*) "gtau do not match!"
             stop 1
