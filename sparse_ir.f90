@@ -434,7 +434,7 @@ module sparse_ir
         integer :: i, info, lda, ldu, ldvt, lwork, m, n, mn, ns, m_half
         double precision, allocatable :: a_copy(:, :), u(:, :), &
             vt(:, :), work(:)
-        complex(kind(0d0)) :: u_copy(:, :)
+        complex(kind(0d0)), allocatable :: u_copy(:, :)
         double precision, allocatable :: rwork(:), s(:)
         integer, allocatable :: iwork(:)
         type(DecomposedMatrix_z)::dmat
