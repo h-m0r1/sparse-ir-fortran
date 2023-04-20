@@ -155,7 +155,7 @@ module sparse_ir
         allocate(obj%dlr_data(obj%size, obj%nomega))
         obj%dlr_data = transpose(dlr)
 
-        obj%u = decompose(obj%u_data, obj%eps_svd)
+        obj%u = decompose(obj%u_data, obj%eps_svd, .false.)
         if (.not. obj%positive_only) then
             obj%uhat_f = decompose(obj%uhat_f_data, obj%eps_svd, .false.)
             obj%uhat_b = decompose(obj%uhat_b_data, obj%eps_svd, .false.)
@@ -503,26 +503,26 @@ module sparse_ir
             u_copy(1:m_half, 1:ns) = cmplx(u(1:m_half, 1:ns), u(m_half+1:m, 1:ns), kind(0d0))
         end if
     
-        allocate(dmat%a(m, n))
-        allocate(dmat%a_real(m, n))
-        allocate(dmat%a_imag(m, n))
+        allocate(dmat%a(m_half, n))
+        allocate(dmat%a_real(m_half, n))
+        allocate(dmat%a_imag(m_half, n))
         allocate(dmat%inv_s_dl(ns))
         allocate(dmat%inv_s(ns))
-        allocate(dmat%ut(ns, m))
-        allocate(dmat%ut_real(ns, m))
-        allocate(dmat%ut_imag(ns, m))
+        allocate(dmat%ut(ns, m_half))
+        allocate(dmat%ut_real(ns, m_half))
+        allocate(dmat%ut_imag(ns, m_half))
         allocate(dmat%v(n, ns))
         allocate(dmat%v_real(n, ns))
-        allocate(dmat%v_imag(ns, m))
-        allocate(dmat%a_odd(m, n/2))
-        allocate(dmat%a_even(m, n/2))
+        allocate(dmat%v_imag(n, ns))
+        allocate(dmat%a_odd(m_half, n/2))
+        allocate(dmat%a_even(m_half, n/2))
       
         ! dmat%a temporarily stores the same data of input a
         dmat%a = a
         dmat%inv_s_dl(1:ns) = 1.0D0 / s(1:ns)
         ! inv_s temporarily stores the same data of inv_s_dl
         dmat%inv_s(1:ns) = dmat%inv_s_dl(1:ns)
-        dmat%ut(1:ns, 1:m) = (transpose(u_copy(1:m, 1:ns)))
+        dmat%ut(1:ns, 1:m_half) = (transpose(u_copy(1:m_half, 1:ns)))
         dmat%v_real(1:n, 1:ns) = (transpose(vt(1:ns, 1:n)))
         dmat%m = size(a, 1)
         dmat%n = size(a, 2)

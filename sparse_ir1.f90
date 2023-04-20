@@ -1,4 +1,4 @@
-module sparse_ir
+module sparse_ir1
     implicit none
     complex(kind(0d0)), PARAMETER :: cone  = (1.0d0, 0.0d0)
     complex(kind(0d0)), PARAMETER :: ci  = (0.0d0, 1.0d0)
