@@ -521,7 +521,7 @@ module sparse_ir
         ! inv_s temporarily stores the same data of inv_s_dl
         dmat%inv_s(1:ns) = dmat%inv_s_dl(1:ns)
         dmat%ut(1:ns, 1:m_half) = conjg(transpose(u_copy(1:m_half, 1:ns)))
-        dmat%v_real(1:n, 1:ns) = conjg(transpose(vt(1:ns, 1:n)))
+        dmat%v_real(1:n, 1:ns) = transpose(vt(1:ns, 1:n))
         dmat%m = size(a, 1)
         dmat%n = size(a, 2)
         dmat%ns = ns
