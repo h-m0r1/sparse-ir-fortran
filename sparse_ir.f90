@@ -125,8 +125,8 @@ module sparse_ir
             obj%freq_f = freq_f
             obj%freq_b = freq_b
         else
-            obj%freq_f = freq_f((size(freq_f) / 2):size(freq_f))
-            obj%freq_b = freq_b((size(freq_b - 1) / 2):size(freq_b))
+            obj%freq_f = freq_f((size(freq_f) / 2 + 1):size(freq_f))
+            obj%freq_b = freq_b((size(freq_b + 1) / 2):size(freq_b))
         end if
 
         allocate(obj%u_data(obj%ntau, obj%size))
@@ -140,8 +140,8 @@ module sparse_ir
             obj%uhat_f_data = uhat_f
             obj%uhat_b_data = uhat_b
         else
-            obj%uhat_f_data = uhat_f((size(freq_f) / 2):size(freq_f), :)
-            obj%uhat_b_data = uhat_b((size(freq_b - 1) / 2):size(freq_b), :)
+            obj%uhat_f_data = uhat_f((size(freq_f) / 2 + 1):size(freq_f), :)
+            obj%uhat_b_data = uhat_b((size(freq_b + 1) / 2):size(freq_b), :)
         end if
 
         allocate(obj%y(obj%nomega))
@@ -464,9 +464,9 @@ module sparse_ir
         a_copy(1:m_half, 1:n) = real(a(1:m_half, 1:n))
     
         if (has_zero) then
-            a_copy(m_half+1:m, 1:n) = aimag(a(2:m, 1:n))
+            a_copy(m_half+1:m, 1:n) = aimag(a(2:m_half, 1:n))
         else
-            a_copy(m_half+1:m, 1:n) = aimag(a(1:m, 1:n))
+            a_copy(m_half+1:m, 1:n) = aimag(a(1:m_half, 1:n))
         end if
     
         if (.not. ill_conditioned) then
