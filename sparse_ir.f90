@@ -418,9 +418,9 @@ module sparse_ir
         dmat%v = dmat%v_real
       
         if (.not. ill_conditioned) then
-            deallocate(work, a_copy, s, u, vt, rwork, iwork)
+            deallocate(work, a_copy, s, u, vt, iwork)
         else
-            deallocate(work, a_copy, s, u, vt, rwork)
+            deallocate(work, a_copy, s, u, vt)
         endif
     end function
     
@@ -432,9 +432,8 @@ module sparse_ir
       
         integer :: i, info, lda, ldu, ldvt, lwork, m, n, mn, ns, m_half
         double precision, allocatable :: a_copy(:, :), u(:, :), &
-            vt(:, :), work(:)
+            vt(:, :), work(:), s(:)
         complex(kind(0d0)), allocatable :: u_copy(:, :)
-        double precision, allocatable :: rwork(:), s(:)
         integer, allocatable :: iwork(:)
         type(DecomposedMatrix_z)::dmat
       
@@ -537,9 +536,9 @@ module sparse_ir
         dmat%v = cmplx(dmat%v_real, zero, kind(0d0))
       
         if (.not. ill_conditioned) then
-            deallocate(work, a_copy, s, u, vt, rwork, iwork)
+            deallocate(work, a_copy, s, u, vt, iwork, u_copy)
         else
-            deallocate(work, a_copy, s, u, vt, rwork)
+            deallocate(work, a_copy, s, u, vt, u_copy)
         endif
     end function
     
