@@ -1088,7 +1088,7 @@ module sparse_ir
             ut_arr_tmp(:, :) = zero
             call dgemm("n", "t", ns, l1, m, one, obj%uhat_f%ut_imag, ns, arr_tmp, l1, zero, ut_arr_tmp, ns)
         
-            ut_arr_r(:, :) = ut_arr_r(:, :) + ut_arr_tmp(:, :)
+            ut_arr_r(:, :) = ut_arr_r(:, :) - ut_arr_tmp(:, :)
             do j = 1, ns
                 do i = 1, l1
                     ut_arr_r(j, i) = ut_arr_r(j, i) * obj%uhat_f%inv_s(j)
