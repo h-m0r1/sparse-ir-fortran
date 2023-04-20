@@ -180,11 +180,12 @@ module sparse_ir
         obj%tau = 5.0d-1 * beta * (obj%x + 1.d0)
         obj%omega = obj%y * obj%wmax
 
-        obj%u%a(:, :) = sqrt(2.0d0/beta)*obj%u_data(:, :)
+        obj%u%a_real(:, :) = sqrt(2.0d0/beta)*obj%u_data(:, :)
         obj%uhat_f%a(:, :) = sqrt(beta) * obj%uhat_f_data(:, :)
         obj%uhat_b%a(:, :) = sqrt(beta) * obj%uhat_b_data(:, :)
         !obj%dlr%a(:, :) = sqrt(5.0d-1*beta)*obj%dlr_data(:, :)
 
+        obj%u%a = cmplx(obj%u%a_real, zero, kind(0d0))
         obj%uhat_f%a_real = REAL(obj%uhat_f%a, KIND(0d0))
         obj%uhat_f%a_imag = AIMAG(obj%uhat_f%a)
         obj%uhat_b%a_real = REAL(obj%uhat_b%a, KIND(0d0))
