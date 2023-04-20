@@ -454,7 +454,7 @@ module sparse_ir
         ldu = m
         ldvt = n
         if (.not. ill_conditioned) then
-            lwork = 4*mn*mn + 7*mn
+            lwork = 4*mn*mn + 6*mn + max(m, n)
             allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n), iwork(8*mn))
         else
             lwork = 5*mn + m + n
@@ -470,14 +470,14 @@ module sparse_ir
         end if
     
         if (.not. ill_conditioned) then
-            lwork = 4*mn*mn + 7*mn
-            call dgesdd('S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, iwork, info)
+            lwork = 4*mn*mn + 6*mn + max(m, n)
+            call dgesdd('A', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, iwork, info)
             if (info /= 0) then
                 stop 'Failure in DGESDD.'
             end if
         else
             lwork = 5*mn + m + n
-            call dgesvd('S', 'S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, info)
+            call dgesvd('A', 'A', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, info)
             if (info /= 0) then
                 stop 'Failure in DGESVD.'
             end if
