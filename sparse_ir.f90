@@ -347,8 +347,7 @@ module sparse_ir
       
         integer :: i, info, lda, ldu, ldvt, lwork, m, n, mn, ns
         double precision, allocatable :: a_copy(:, :), u(:, :), &
-            vt(:, :), work(:)
-        double precision, allocatable :: rwork(:), s(:)
+            vt(:, :), work(:), s(:)
         integer, allocatable :: iwork(:)
         type(DecomposedMatrix_d)::dmat
       
@@ -363,23 +362,23 @@ module sparse_ir
         ldu = m
         ldvt = n
         if (.not. ill_conditioned) then
-            lwork = mn*mn + 3*mn
-            allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n), rwork((5*mn+7)*mn), iwork(8*mn))
+            lwork = 4*mn*mn + 7*mn
+            allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n), iwork(8*mn))
         else
-            lwork = 2*mn + m + n
-            allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n), rwork(5*n))
+            lwork = 5*mn + m + n
+            allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n))
         endif
       
         a_copy(1:m, 1:n) = a(1:m, 1:n)
         if (.not. ill_conditioned) then
-            lwork = mn*mn + 3*mn
-            call dgesdd('S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, rwork, iwork, info)
+            lwork = 4*mn*mn + 7*mn
+            call dgesdd('S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, iwork, info)
             if (info /= 0) then
                 stop 'Failure in DGESDD.'
             end if
         else
-            lwork = 2*mn + m + n
-            call dgesvd('S', 'S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, rwork, info)
+            lwork = 5*mn + m + n
+            call dgesvd('S', 'S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, info)
             if (info /= 0) then
                 stop 'Failure in DGESVD.'
             end if
@@ -456,12 +455,12 @@ module sparse_ir
         ldu = m
         ldvt = n
         if (.not. ill_conditioned) then
-            lwork = mn*mn + 3*mn
-            allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n), rwork((5*mn+7)*mn), iwork(8*mn))
+            lwork = 4*mn*mn + 7*mn
+            allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n), iwork(8*mn))
         else
-            lwork = 2*mn + m + n
-            allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n), rwork(5*n))
-        end if
+            lwork = 5*mn + m + n
+            allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n))
+        endif
     
         a_copy(1:m_half, 1:n) = real(a(1:m_half, 1:n))
     
@@ -472,14 +471,14 @@ module sparse_ir
         end if
     
         if (.not. ill_conditioned) then
-            lwork = mn*mn + 3*mn
-            call dgesdd('S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, rwork, iwork, info)
+            lwork = 4*mn*mn + 7*mn
+            call dgesdd('S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, iwork, info)
             if (info /= 0) then
                 stop 'Failure in DGESDD.'
             end if
         else
-            lwork = 2*mn + m + n
-            call dgesvd('S', 'S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, rwork, info)
+            lwork = 5*mn + m + n
+            call dgesvd('S', 'S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, info)
             if (info /= 0) then
                 stop 'Failure in DGESVD.'
             end if
