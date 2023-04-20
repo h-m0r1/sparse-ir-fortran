@@ -21,6 +21,7 @@ module sparse_ir_io
             else
                 obj = read_v1(unit, beta, positive_only)
             end if
+        else
             write(*, *) "Invalid version number", version
             stop "Stopping..."
         end if
