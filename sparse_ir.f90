@@ -320,8 +320,8 @@ module sparse_ir
         allocate(dmat%v(n, ns))
         allocate(dmat%v_real(n, ns))
         allocate(dmat%v_imag(n, ns))
-        allocate(dmat%a_odd(m_half, n/2))
-        allocate(dmat%a_even(m_half, n/2))
+        allocate(dmat%a_odd(m, n/2))
+        allocate(dmat%a_even(m, n/2))
       
         ! dmat%a temporarily stores the same data of input a
         dmat%a = a
