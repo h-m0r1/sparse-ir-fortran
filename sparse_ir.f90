@@ -212,10 +212,10 @@ module sparse_ir
         if (allocated(obj%v_data)) deallocate(obj%v_data)
         if (allocated(obj%dlr_data)) deallocate(obj%dlr_data)
     
-        call finalize_dmat(obj%u)
-        call finalize_dmat(obj%uhat_f)
-        call finalize_dmat(obj%uhat_b)
-        !call finalize_dmat(obj%dlr)
+        call finalize_dmat_d(obj%u)
+        call finalize_dmat_z(obj%uhat_f)
+        call finalize_dmat_z(obj%uhat_b)
+        !call finalize_dmat_d(obj%dlr)
     end subroutine
 
     subroutine finalize_dmat_z(dmat)
