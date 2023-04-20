@@ -205,6 +205,11 @@ program main
             write(*,*) "wmax does not match"
             stop 1
         end if
+        if (positive_only) then
+            do n = 1, ir_obj%nfreq_b
+                write(*,*) ir_obj%freq_b(n)
+            end do
+        end if
     
         ! With ω0 = 1/β,
         !   G(iv) = 1/(iv - ω0),
