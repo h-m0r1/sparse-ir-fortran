@@ -13,10 +13,20 @@ F90FLAGS = -O2 -g -traceback
 %.mod: %.f90 %.o
 	@:
 
-test_sparse_ir.x: time_measurement.o sparse_ir.o sparse_ir_io.o sparse_ir_preset.o
+test_sparse_ir.x: test_sparse_ir.o sparse_ir.o sparse_ir_io.o sparse_ir_preset.o
 	$(LINK.f) $^ $(LDLIBS) $(LDFLAGS) -o $@
 
 test_sparse_ir.o: sparse_ir.mod sparse_ir_io.mod sparse_ir_preset.mod
+
+test_sparse_ir1.x: test_sparse_ir1.o sparse_ir1.o sparse_ir_io.o sparse_ir_preset.o
+	$(LINK.f) $^ $(LDLIBS) $(LDFLAGS) -o $@
+
+test_sparse_ir1.o: sparse_ir1.mod sparse_ir_io.mod sparse_ir_preset.mod
+
+test_sparse_ir2.x: test_sparse_ir2.o sparse_ir2.o sparse_ir_io.o sparse_ir_preset.o
+	$(LINK.f) $^ $(LDLIBS) $(LDFLAGS) -o $@
+
+test_sparse_ir2.o: sparse_ir2.mod sparse_ir_io.mod sparse_ir_preset.mod
 
 time_measurement.x: time_measurement.o sparse_ir.o sparse_ir_io.o sparse_ir_preset.o
 	$(LINK.f) $^ $(LDLIBS) $(LDFLAGS) -o $@
