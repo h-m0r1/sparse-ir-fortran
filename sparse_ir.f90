@@ -1068,7 +1068,7 @@ module sparse_ir
         call zgemm("t", "t", l1, n, ns, cone, ut_arr, ns, obj%uhat_f%v, n, czero, res_tmp, l2)
     
         res(:, :) = real(res_tmp(:, :), kind(0d0)) 
-        deallocate(ut_arr, arr_tmp)
+        deallocate(ut_arr, res_tmp)
     end subroutine
     
     subroutine fit_matsubara_b_zz(obj, arr, res)
@@ -1152,7 +1152,7 @@ module sparse_ir
         call zgemm("t", "t", l1, n, ns, cone, ut_arr, ns, obj%uhat_b%v, n, czero, res_tmp, l2)
     
         res(:, :) = real(res_tmp(:, :), kind(0d0)) 
-        deallocate(ut_arr, arr_tmp)
+        deallocate(ut_arr, res_tmp)
     end subroutine
 
 end module
