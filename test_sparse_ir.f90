@@ -70,7 +70,7 @@ program main
         allocate(gl_matsu_d(1, ir_obj%size))
         allocate(gl_tau_d(1, ir_obj%size))
         allocate(gtau_reconst_d(1, ir_obj%ntau))
-
+        write(*,*) "test_fermion0"
         ! From Matsubara
         do n = 1, ir_obj%nfreq_f
             giv(1, n) = 1.d0/(cmplx(0d0, PI*ir_obj%freq_f(n)/beta, kind(0d0)) - omega0)
@@ -80,6 +80,7 @@ program main
         else
             call fit_matsubara_f(ir_obj, giv, gl_matsu)
         end if
+        write(*,*) "test_fermion1"
 
         ! From tau
         !   G(τ=0) = - exp(-τ ω0)/(1+exp(-β ω0)),
@@ -96,7 +97,7 @@ program main
         else
             call fit_tau(ir_obj, gtau, gl_tau)
         end if
-
+        write(*,*) "test_fermion2"
         !do l = 1, ir_obj%size
             !write(*,*) real(gl_matsu(1,l)), real(gl_tau(1,l))
         !end do
@@ -120,7 +121,7 @@ program main
             write(*,*) "giv do not match!"
             stop 1
         end if
-
+        write(*,*) "test_fermion3"
         if (lflag_gtau .and. lflag_gl) then
             call evaluate_tau(ir_obj, gl_tau_d, gtau_reconst_d)
         elseif ((.not. lflag_gtau) .and. lflag_gl) then
