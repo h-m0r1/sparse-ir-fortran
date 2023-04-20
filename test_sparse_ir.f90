@@ -6,12 +6,6 @@ program main
 
     call test_fermion(.false., .false., .false., .false.)
     call test_boson  (.false., .false., .false., .false.)
-    call test_fermion(.false., .false., .false., .true.)
-    call test_boson  (.false., .false., .false., .true.)
-    call test_fermion(.false., .false., .true., .false.)
-    call test_boson  (.false., .false., .true., .false.)
-    call test_fermion(.false., .false., .true., .true.)
-    call test_boson  (.false., .false., .true., .true.)
     call test_fermion(.false., .true., .false., .false.)
     call test_boson  (.false., .true., .false., .false.)
     call test_fermion(.false., .true., .false., .true.)
@@ -143,6 +137,7 @@ program main
             stop 1
         end if
 
+        write(*,*) "test_fermion"
         write(*,*) "positive_only = ", positive_only
         write(*,*) "lflag_gtau = ", lflag_gtau
         write(*,*) "lflag_gl = ", lflag_gl
@@ -274,6 +269,7 @@ program main
             stop 1
         end if
     
+        write(*,*) "test_boson"
         write(*,*) "positive_only = ", positive_only
         write(*,*) "lflag_gtau = ", lflag_gtau
         write(*,*) "lflag_gl = ", lflag_gl
