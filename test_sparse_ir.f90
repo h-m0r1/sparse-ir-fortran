@@ -100,8 +100,9 @@ program main
         write(*,*) "test_fermion2"
         if (lflag_gl) then
             do l = 1, ir_obj%size
-                write(*,*) gl_matsu_d(1,l)
-                write(*,*) gl_tau_d(1,l)
+                !write(*,*) gl_matsu_d(1,l)
+                !write(*,*) gl_tau_d(1,l)
+                write(*,*) gl_matsu_d(1,l) - gl_tau_d(1,l)
             end do
             write(*,*) maxval(abs(gl_matsu_d - gl_tau_d))
             if (maxval(abs(gl_matsu_d - gl_tau_d)) > 1d2*eps) then
