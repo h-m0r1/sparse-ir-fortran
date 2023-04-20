@@ -999,6 +999,9 @@ module sparse_ir
         !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
         ut_arr(:, :) = czero
         call zgemm("n", "t", ns, l1, m, cone, obj%uhat_f%ut, ns, arr, l1, czero, ut_arr, ns)
+        IF (obj%positive_only) then
+            ut_arr(:, :) = cmplx(real(ut_arr(:, :)), zero, kind(0d0))
+        ENDIF
         do j = 1, ns
             do i = 1, l1
                 ut_arr(j, i) = ut_arr(j, i) * obj%uhat_f%inv_s(j)
@@ -1086,6 +1089,9 @@ module sparse_ir
         !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
         ut_arr(:, :) = czero
         call zgemm("n", "t", ns, l1, m, cone, obj%uhat_b%ut, ns, arr, l1, czero, ut_arr, ns)
+        IF (obj%positive_only) then
+            ut_arr(:, :) = cmplx(real(ut_arr(:, :)), zero, kind(0d0))
+        ENDIF
         do j = 1, ns
             do i = 1, l1
                 ut_arr(j, i) = ut_arr(j, i) * obj%uhat_b%inv_s(j)
