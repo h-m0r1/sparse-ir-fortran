@@ -100,8 +100,8 @@ program main
         write(*,*) "test_fermion2"
         if (lflag_gl) then
             do l = 1, ir_obj%size
-                write(*,*) gl_matsu_d(:,l)
-                write(*,*) gl_tau_d(:,l)
+                write(*,*) gl_matsu_d(1,l)
+                write(*,*) gl_tau_d(1,l)
             end do
             if (maxval(abs(gl_matsu_d - gl_tau_d)) > 1d2*eps) then
                 write(*,*) "gl_matsu and gl_tau do not match!"
@@ -109,8 +109,8 @@ program main
             end if
         else
             do l = 1, ir_obj%size
-                write(*,*) real(gl_matsu(:,l))
-                write(*,*) real(gl_tau(:,l))
+                write(*,*) real(gl_matsu(1,l))
+                write(*,*) real(gl_tau(1,l))
             end do
             if (maxval(abs(gl_matsu - gl_tau)) > 1d2*eps) then
                 write(*,*) "gl_matsu and gl_tau do not match!"
@@ -237,8 +237,8 @@ program main
     
         if (lflag_gl) then
             do l = 1, ir_obj%size
-                write(*,*) gl_matsu_d(:,l)
-                write(*,*) gl_tau_d(:,l)
+                write(*,*) gl_matsu_d(1,l)
+                write(*,*) gl_tau_d(1,l)
             end do
             if (maxval(abs(gl_matsu_d - gl_tau_d)) > 1d2*eps) then
                 write(*,*) "gl_matsu and gl_tau do not match!"
@@ -246,8 +246,8 @@ program main
             end if
         else
             do l = 1, ir_obj%size
-                write(*,*) real(gl_matsu(:,l))
-                write(*,*) real(gl_tau(:,l))
+                write(*,*) real(gl_matsu(1,l))
+                write(*,*) real(gl_tau(1,l))
             end do
             if (maxval(abs(gl_matsu - gl_tau)) > 1d2*eps) then
                 write(*,*) "gl_matsu and gl_tau do not match!"
