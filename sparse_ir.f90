@@ -407,8 +407,8 @@ module sparse_ir
         dmat%inv_s_dl(1:ns) = 1.0D0 / s(1:ns)
         ! inv_s temporarily stores the same data of inv_s_dl
         dmat%inv_s(1:ns) = dmat%inv_s_dl(1:ns)
-        dmat%ut_real(1:ns, 1:m) = (transpose(u(1:m, 1:ns)))
-        dmat%v_real(1:n, 1:ns) = (transpose(vt(1:ns, 1:n)))
+        dmat%ut_real(1:ns, 1:m) = transpose(u(1:m, 1:ns))
+        dmat%v_real(1:n, 1:ns) = transpose(vt(1:ns, 1:n))
         dmat%m = size(a, 1)
         dmat%n = size(a, 2)
         dmat%ns = ns
@@ -454,7 +454,7 @@ module sparse_ir
         ldu = m
         ldvt = n
         if (.not. ill_conditioned) then
-            lwork = 4*mn*mn + 6*mn + max(m, n)
+            lwork = 4*mn*mn + 7*mn
             allocate(work(lwork), a_copy(m,n), s(m), u(ldu,m), vt(ldvt,n), iwork(8*mn))
         else
             lwork = 5*mn + m + n
@@ -470,14 +470,14 @@ module sparse_ir
         end if
     
         if (.not. ill_conditioned) then
-            lwork = 4*mn*mn + 6*mn + max(m, n)
-            call dgesdd('A', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, iwork, info)
+            lwork = 4*mn*mn + 7*mn
+            call dgesdd('S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, iwork, info)
             if (info /= 0) then
                 stop 'Failure in DGESDD.'
             end if
         else
             lwork = 5*mn + m + n
-            call dgesvd('A', 'A', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, info)
+            call dgesvd('S', 'S', m, n, a_copy, lda, s, u, ldu, vt, ldvt, work, lwork, info)
             if (info /= 0) then
                 stop 'Failure in DGESVD.'
             end if
@@ -520,8 +520,8 @@ module sparse_ir
         dmat%inv_s_dl(1:ns) = 1.0D0 / s(1:ns)
         ! inv_s temporarily stores the same data of inv_s_dl
         dmat%inv_s(1:ns) = dmat%inv_s_dl(1:ns)
-        dmat%ut(1:ns, 1:m_half) = (transpose(u_copy(1:m_half, 1:ns)))
-        dmat%v_real(1:n, 1:ns) = (transpose(vt(1:ns, 1:n)))
+        dmat%ut(1:ns, 1:m_half) = conjg(transpose(u_copy(1:m_half, 1:ns)))
+        dmat%v_real(1:n, 1:ns) = conjg(transpose(vt(1:ns, 1:n)))
         dmat%m = size(a, 1)
         dmat%n = size(a, 2)
         dmat%ns = ns
