@@ -1144,7 +1144,7 @@ module sparse_ir2
         end do
     
         ! ut_arr(ns, l1) * v(n, ns) -> res(l2, n)
-        call dgemm("t", "t", l1, n, ns, one, ut_arr, ns, obj%u%v_real, n, zero, res_tmp, l2)
+        call dgemm("t", "t", l1, n, ns, one, ut_arr, ns, obj%u%v_real, n, zero, res, l2)
     
         deallocate(ut_arr)
     end subroutine
