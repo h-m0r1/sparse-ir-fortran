@@ -586,9 +586,9 @@ module sparse_ir
         IF (.not. obj%positive_only) stop 'input and output arrays should be complex arrays.'
         res(:, :) = zero
         !
-        allocate(arr_tmp(l1, m))
+        allocate(arr_tmp(l1, n))
         arr_tmp(:, :) = cmplx(arr(:, :), zero, kind(0d0))
-        allocate(res_tmp(l2, n))
+        allocate(res_tmp(l2, m))
         res_tmp(:, :) = czero
         CALL ZGEMM('n', 't', l1, m, n, cone, arr_tmp(:,:), &
                    l2, obj%u%a, m, czero, res_tmp(:, :), l2)
@@ -614,7 +614,7 @@ module sparse_ir
         IF (.not. obj%positive_only) stop 'input array should be a complex array.'
         res(:, :) = czero
         !
-        allocate(arr_tmp(l1, m))
+        allocate(arr_tmp(l1, n))
         arr_tmp(:, :) = cmplx(arr(:, :), zero, kind(0d0))
         CALL ZGEMM('n', 't', l1, m, n, cone, arr_tmp(:,:), &
                    l2, obj%u%a, m, czero, res(:, :), l2)
@@ -639,7 +639,7 @@ module sparse_ir
         IF (.not. obj%positive_only) stop 'output array should be a complex array.'
         res(:, :) = zero
         !
-        allocate(res_tmp(l2, n))
+        allocate(res_tmp(l2, m))
         res_tmp(:, :) = czero
         CALL ZGEMM('n', 't', l1, m, n, cone, arr(:,:), &
                    l2, obj%u%a, m, czero, res_tmp(:, :), l2)
