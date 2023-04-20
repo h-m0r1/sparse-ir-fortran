@@ -991,7 +991,7 @@ module sparse_ir
             end do
     
             ! ut_arr(ns, l1) * v(n, ns) -> res(l2, n)
-            res_r(:, :) = zero
+            res_i(:, :) = zero
             call dgemm("t", "t", l1, n, ns, one, ut_arr, ns, obj%u%v_real, n, zero, res_i, l2)
             res = cmplx(res_r, res_i, kind(0d0))
             deallocate(arr_tmp)
