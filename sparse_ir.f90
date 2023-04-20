@@ -828,7 +828,7 @@ module sparse_ir
     
         !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
         ut_arr(:, :) = czero
-        call zgemm("n", "t", ns, l1, m, cone, obj%u%ut, ns, arr, l1, czero, ut_arr, ns)
+        call zgemm("n", "t", ns, l1, m, cone, obj%u%ut, ns, arr_tmp, l1, czero, ut_arr, ns)
         do j = 1, ns
             do i = 1, l1
                 ut_arr(j, i) = ut_arr(j, i) * obj%u%inv_s(j)
