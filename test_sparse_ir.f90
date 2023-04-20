@@ -36,7 +36,7 @@ program main
             gtau_reconst(:, :), giv_reconst(:, :)
         double precision,allocatable :: gl_matsu_d(:, :), gl_tau_d(:, :), gtau_d(:, :), &
             gtau_reconst_d(:, :)
-        integer n, t
+        integer n, t, l
 
         PI =4.D0*DATAN(1.D0)
 
@@ -98,9 +98,6 @@ program main
             call fit_tau(ir_obj, gtau, gl_tau)
         end if
         write(*,*) "test_fermion2"
-        !do l = 1, ir_obj%size
-            !write(*,*) real(gl_matsu(1,l)), real(gl_tau(1,l))
-        !end do
         if (lflag_gl) then
             do l = 1, ir_obj%size
                 write(*,*) gl_matsu_d(:,l)
@@ -177,7 +174,7 @@ program main
             gtau_reconst(:, :), giv_reconst(:, :)
         double precision,allocatable :: gl_matsu_d(:, :), gl_tau_d(:, :), gtau_d(:, :), &
             gtau_reconst_d(:, :)
-        integer n, t
+        integer n, t, l
     
         PI =4.D0*DATAN(1.D0)
     
@@ -238,15 +235,20 @@ program main
             call fit_tau(ir_obj, gtau, gl_tau)
         end if
     
-        !do l = 1, ir_obj%size
-            !write(*,*) real(gl_matsu(1,l)), real(gl_tau(1,l))
-        !end do
         if (lflag_gl) then
+            do l = 1, ir_obj%size
+                write(*,*) gl_matsu_d(:,l)
+                write(*,*) gl_tau_d(:,l)
+            end do
             if (maxval(abs(gl_matsu_d - gl_tau_d)) > 1d2*eps) then
                 write(*,*) "gl_matsu and gl_tau do not match!"
                 stop 1
             end if
         else
+            do l = 1, ir_obj%size
+                write(*,*) real(gl_matsu(:,l))
+                write(*,*) real(gl_tau(:,l))
+            end do
             if (maxval(abs(gl_matsu - gl_tau)) > 1d2*eps) then
                 write(*,*) "gl_matsu and gl_tau do not match!"
                 stop 1
