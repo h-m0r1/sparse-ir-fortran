@@ -33,7 +33,7 @@ program main
         logical :: positive_only
         logical :: lflag_gtau
         logical :: lflag_gl
-        integer n, t, l
+        integer n, t, l, i
         integer:: time_begin_c, time_end_c, CountPerSec, CountMax
 
         PI =4.D0*DATAN(1.D0)
@@ -254,7 +254,8 @@ program main
             gtau_reconst(:, :), giv_reconst(:, :)
         double precision,allocatable :: gl_matsu_d(:, :), gl_tau_d(:, :), gtau_d(:, :), &
             gtau_reconst_d(:, :)
-        integer n, t, l
+        integer n, t, l, i
+        integer:: time_begin_c, time_end_c, CountPerSec, CountMax
   
         PI =4.D0*DATAN(1.D0)
   
