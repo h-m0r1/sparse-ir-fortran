@@ -30,9 +30,6 @@ program main
             gtau_reconst(:, :), giv_reconst(:, :)
         double precision,allocatable :: gl_matsu_d(:, :), gl_tau_d(:, :), gtau_d(:, :), &
             gtau_reconst_d(:, :)
-        logical :: positive_only
-        logical :: lflag_gtau
-        logical :: lflag_gl
         integer n, t, l, i
         integer:: time_begin_c, time_end_c, CountPerSec, CountMax
 
