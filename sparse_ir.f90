@@ -163,10 +163,6 @@ module sparse_ir
             obj%uhat_f = split_decompose(obj%uhat_f_data, .false., obj%eps_svd, .false.)
             obj%uhat_b = split_decompose(obj%uhat_b_data, .true., obj%eps_svd, .false.)
         end if
-        obj%uhat_f%a_odd(:, :) = obj%uhat_f%a_imag(:, 1:(obj%uhat_f%n - 1):2)
-        obj%uhat_f%a_even(:, :) = obj%uhat_f%a_real(:, 2:obj%uhat_f%n:2)
-        obj%uhat_b%a_odd(:, :) = obj%uhat_b%a_real(:, 1:(obj%uhat_b%n - 1):2)
-        obj%uhat_b%a_even(:, :) = obj%uhat_b%a_imag(:, 2:obj%uhat_b%n:2)
 
         !obj%dlr = decompose(obj%dlr_data, obj%eps_svd, .true.)
 
@@ -188,6 +184,15 @@ module sparse_ir
         obj%uhat_f%a(:, :) = sqrt(beta) * obj%uhat_f_data(:, :)
         obj%uhat_b%a(:, :) = sqrt(beta) * obj%uhat_b_data(:, :)
         !obj%dlr%a(:, :) = sqrt(5.0d-1*beta)*obj%dlr_data(:, :)
+
+        obj%uhat_f%a_real = REAL(obj%uhat_f%a, KIND(0d0))
+        obj%uhat_f%a_imag = AIMAG(obj%uhat_f%a)
+        obj%uhat_b%a_real = REAL(obj%uhat_b%a, KIND(0d0))
+        obj%uhat_b%a_imag = AIMAG(obj%uhat_b%a)
+        obj%uhat_f%a_odd(:, :) = obj%uhat_f%a_imag(:, 1:(obj%uhat_f%n - 1):2)
+        obj%uhat_f%a_even(:, :) = obj%uhat_f%a_real(:, 2:obj%uhat_f%n:2)
+        obj%uhat_b%a_odd(:, :) = obj%uhat_b%a_real(:, 1:(obj%uhat_b%n - 1):2)
+        obj%uhat_b%a_even(:, :) = obj%uhat_b%a_imag(:, 2:obj%uhat_b%n:2)
 
         obj%u%inv_s(:) = sqrt(5.0d-1*beta) * obj%u%inv_s_dl(:)
         obj%uhat_f%inv_s(:) = (1.0d0 / sqrt(beta)) * obj%uhat_f%inv_s_dl(:)
