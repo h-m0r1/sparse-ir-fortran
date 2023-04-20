@@ -1,3 +1,5 @@
+#!/bin/sh
+
 rm Makefile
 cat <<EOF > Makefile
 FC = ifort
