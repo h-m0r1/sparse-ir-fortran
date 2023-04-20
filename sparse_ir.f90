@@ -102,7 +102,7 @@ module sparse_ir
             obj%nfreq_b = size(freq_b)
         else
             obj%nfreq_f = size(freq_f) / 2
-            obj%nfreq_b = size(freq_b - 1) / 2 + 1
+            obj%nfreq_b = (size(freq_b)-1) / 2 + 1
         end if
         obj%lambda = lambda
         obj%eps = eps
@@ -126,7 +126,7 @@ module sparse_ir
             obj%freq_b = freq_b
         else
             obj%freq_f(1:obj%nfreq_f) = freq_f((size(freq_f) / 2 + 1):size(freq_f))
-            obj%freq_b(1:obj%nfreq_b) = freq_b((size(freq_b + 1) / 2):size(freq_b))
+            obj%freq_b(1:obj%nfreq_b) = freq_b(((size(freq_b) + 1) / 2):size(freq_b))
         end if
 
         allocate(obj%u_data(obj%ntau, obj%size))
@@ -141,7 +141,7 @@ module sparse_ir
             obj%uhat_b_data = uhat_b
         else
             obj%uhat_f_data(1:obj%nfreq_f, :) = uhat_f((size(freq_f) / 2 + 1):size(freq_f), :)
-            obj%uhat_b_data(1:obj%nfreq_b, :) = uhat_b((size(freq_b + 1) / 2):size(freq_b), :)
+            obj%uhat_b_data(1:obj%nfreq_b, :) = uhat_b(((size(freq_b) + 1) / 2):size(freq_b), :)
         end if
 
         allocate(obj%y(obj%nomega))
