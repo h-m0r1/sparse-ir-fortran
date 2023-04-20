@@ -28,7 +28,7 @@ module sparse_ir_io
 
 
     ! Read sampling points, basis functions (version 1)
-    function read_v1(unit, beta) result(obj)
+    function read_v1(unit, beta, positive_only) result(obj)
         integer, intent (in) :: unit
         double precision, intent (in) :: beta
         logical, intent(in), optional :: positive_only
