@@ -252,8 +252,8 @@ program main
             end if
         else
             do l = 1, ir_obj%size
-                write(*,*) real(gl_matsu(1,l))
-                write(*,*) real(gl_tau(1,l))
+                write(*,*) real(gl_matsu(1,l)), aimag(gl_matsu(1,l))
+                write(*,*) real(gl_tau(1,l)), aimag(gl_tau(1,l))
             end do
             write(*,*) maxval(abs(gl_matsu - gl_tau))
             if (maxval(abs(gl_matsu - gl_tau)) > 1d2*eps) then
