@@ -70,7 +70,7 @@ program main
         allocate(gl_matsu_d(1, ir_obj%size))
         allocate(gl_tau_d(1, ir_obj%size))
         allocate(gtau_reconst_d(1, ir_obj%ntau))
-        write(*,*) "test_fermion0"
+
         ! From Matsubara
         do n = 1, ir_obj%nfreq_f
             giv(1, n) = 1.d0/(cmplx(0d0, PI*ir_obj%freq_f(n)/beta, kind(0d0)) - omega0)
@@ -80,7 +80,6 @@ program main
         else
             call fit_matsubara_f(ir_obj, giv, gl_matsu)
         end if
-        write(*,*) "test_fermion1"
 
         ! From tau
         !   G(τ=0) = - exp(-τ ω0)/(1+exp(-β ω0)),
@@ -97,7 +96,7 @@ program main
         else
             call fit_tau(ir_obj, gtau, gl_tau)
         end if
-        write(*,*) "test_fermion2"
+
         if (lflag_gl) then
             do l = 1, ir_obj%size
                 write(*,*) gl_matsu_d(1,l)
@@ -133,7 +132,7 @@ program main
             write(*,*) "giv do not match!"
             stop 1
         end if
-        write(*,*) "test_fermion3"
+
         if (lflag_gtau .and. lflag_gl) then
             call evaluate_tau(ir_obj, gl_tau_d, gtau_reconst_d)
         elseif ((.not. lflag_gtau) .and. lflag_gl) then
@@ -155,6 +154,7 @@ program main
         end if
 
         write(*,*) "test_fermion"
+        write(*,*) "preset = ", preset
         write(*,*) "positive_only = ", positive_only
         write(*,*) "lflag_gtau = ", lflag_gtau
         write(*,*) "lflag_gl = ", lflag_gl
@@ -205,11 +205,6 @@ program main
             write(*,*) "wmax does not match"
             stop 1
         end if
-        if (positive_only) then
-            do n = 1, ir_obj%nfreq_b
-                write(*,*) ir_obj%freq_b(n)
-            end do
-        end if
     
         ! With ω0 = 1/β,
         !   G(iv) = 1/(iv - ω0),
@@ -224,7 +219,7 @@ program main
         allocate(gl_matsu_d(1, ir_obj%size))
         allocate(gl_tau_d(1, ir_obj%size))
         allocate(gtau_reconst_d(1, ir_obj%ntau))
-    
+
         ! From Matsubara
         do n = 1, ir_obj%nfreq_b
             giv(1, n) = 1.d0/(cmplx(0d0, PI*ir_obj%freq_b(n)/beta, kind(0d0)) - omega0)
@@ -234,7 +229,7 @@ program main
         else
             call fit_matsubara_b(ir_obj, giv, gl_matsu)
         end if
-    
+
         ! From tau
         !   G(τ=0) = - exp(-τ ω0)/(1-exp(-β ω0)),
         do t = 1, ir_obj%ntau
@@ -250,7 +245,7 @@ program main
         else
             call fit_tau(ir_obj, gtau, gl_tau)
         end if
-    
+
         if (lflag_gl) then
             do l = 1, ir_obj%size
                 write(*,*) gl_matsu_d(1,l)
@@ -308,6 +303,7 @@ program main
         end if
     
         write(*,*) "test_boson"
+        write(*,*) "preset = ", preset
         write(*,*) "positive_only = ", positive_only
         write(*,*) "lflag_gtau = ", lflag_gtau
         write(*,*) "lflag_gl = ", lflag_gl
