@@ -1427,7 +1427,7 @@ module sparse_ir
                         kernel = exp(- tau(t) * obj%omega(p)) / (1.0d0 + exp(- obj%beta * obj%omega(p))) 
                     end if
                 end if
-                res(:, t) = res(:, t) - kernel * real(arr(:, p), kind(0d0)))
+                res(:, t) = res(:, t) - kernel * real(arr(:, p), kind(0d0))
             end do
         end do
         !
