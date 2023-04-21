@@ -675,8 +675,7 @@ module sparse_ir
         type(IR), intent(in) :: obj
         double precision, intent (in) :: arr(:, :)
         complex(kind(0d0)), intent(out) :: res(:, :)
-        double precision, allocatable :: res_r(:, :)
-        double precision, allocatable :: res_i(:, :)
+        complex(kind(0d0)), allocatable :: arr_tmp(:, :)
         integer :: m, n, l1, l2
         !
         l1 = size(arr, 1)
@@ -687,24 +686,14 @@ module sparse_ir
         IF (n .NE. obj%uhat_f%n) stop 'wrong number of columns of input array.'
         IF (m .NE. obj%uhat_f%m) stop 'wrong number of columns of output array.'
         IF (.not. obj%positive_only) stop 'input array should be a complex array.'
+        res(:, :) = czero
         !
-        !CALL ZGEMM('n', 't', l1, m, n, cone, arr(:,:), &
-        !           l2, obj%uhat_f%a, m, czero, res(:, :), l2)
+        allocate(arr_tmp(l1, n))
+        arr_tmp(:, :) = cmplx(arr(:, :), zero, kind(0d0))
+        CALL ZGEMM('n', 't', l1, m, n, cone, arr_tmp(:,:), &
+                   l2, obj%uhat_f%a, m, czero, res(:, :), l2)
         !
-        allocate(res_r(l2, m))
-        allocate(res_i(l2, m))
-        ! calculate the real part
-        res_r(:, :) = zero
-        CALL DGEMM('n', 't', l1, m, n, one, arr(:,:), &
-                   l2, obj%uhat_f%a_real, m, zero, res_r(:, :), l2)
-        !
-        ! calculate the imaginary part
-        res_i(:, :) = zero
-        CALL DGEMM('n', 't', l1, m, n, one, arr(:,:), &
-                   l2, obj%uhat_f%a_imag, m, zero, res_i(:, :), l2)
-        res = cmplx(res_r, res_i, kind(0d0))
-        deallocate(res_r)
-        deallocate(res_i)
+        deallocate(arr_tmp)
     end subroutine
     
     subroutine evaluate_matsubara_b_zz(obj, arr, res)
@@ -730,8 +719,7 @@ module sparse_ir
         type(IR), intent(in) :: obj
         double precision, intent (in) :: arr(:, :)
         complex(kind(0d0)), intent(out) :: res(:, :)
-        double precision, allocatable :: res_r(:, :)
-        double precision, allocatable :: res_i(:, :)
+        complex(kind(0d0)), allocatable :: arr_tmp(:, :)
         integer :: m, n, l1, l2
         !
         l1 = size(arr, 1)
@@ -742,24 +730,14 @@ module sparse_ir
         IF (n .NE. obj%uhat_b%n) stop 'wrong number of columns of input array.'
         IF (m .NE. obj%uhat_b%m) stop 'wrong number of columns of output array.'
         IF (.not. obj%positive_only) stop 'input array should be a complex array.'
+        res(:, :) = czero
         !
-        !CALL ZGEMM('n', 't', l1, m, n, cone, arr(:,:), &
-        !           l2, obj%uhat_b%a, m, czero, res(:, :), l2)
+        allocate(arr_tmp(l1, n))
+        arr_tmp(:, :) = cmplx(arr(:, :), zero, kind(0d0))
+        CALL ZGEMM('n', 't', l1, m, n, cone, arr_tmp(:,:), &
+                   l2, obj%uhat_b%a, m, czero, res(:, :), l2)
         !
-        allocate(res_r(l2, m))
-        allocate(res_i(l2, m))
-        ! calculate the real part
-        res_r(:, :) = zero
-        CALL DGEMM('n', 't', l1, m, n, one, arr(:,:), &
-                   l2, obj%uhat_b%a_real, m, zero, res_r(:, :), l2)
-        !
-        ! calculate the imaginary part
-        res_i(:, :) = zero
-        CALL DGEMM('n', 't', l1, m, n, one, arr(:,:), &
-                   l2, obj%uhat_b%a_imag, m, zero, res_i(:, :), l2)
-        res = cmplx(res_r, res_i, kind(0d0))
-        deallocate(res_r)
-        deallocate(res_i)
+        deallocate(arr_tmp)
     end subroutine
     
     subroutine fit_tau_zz(obj, arr, res)
@@ -895,6 +873,8 @@ module sparse_ir
         double precision, intent (in) :: arr(:, :)
         double precision, intent(out) :: res(:, :)
         double precision, allocatable :: ut_arr(:, :)
+        complex(kind(0d0)), allocatable :: arr_tmp(:, :)
+        complex(kind(0d0)), allocatable :: res_tmp(:, :)
     
         integer :: m, n, l1, l2, ns, i, j
     
@@ -913,11 +893,14 @@ module sparse_ir
         IF (m .NE. obj%u%m) stop 'wrong number of columns of input array.'
         IF (n .NE. obj%u%n) stop 'wrong number of columns of output array.'
         IF (.not. obj%positive_only) stop 'input and output arrays should be complex arrays.'
+        allocate(arr_tmp(l1, m))
+        allocate(res_tmp(l2, n))
+        arr_tmp(:, :) = cmplx(arr(:, :), zero, kind(0d0))
         allocate(ut_arr(ns, l1))
     
         !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
-        ut_arr(:, :) = zero
-        call dgemm("n", "t", ns, l1, m, one, obj%u%ut_real, ns, arr, l1, zero, ut_arr, ns)
+        ut_arr(:, :) = czero
+        call zgemm("n", "t", ns, l1, m, cone, obj%u%ut, ns, arr_tmp, l1, czero, ut_arr, ns)
         do j = 1, ns
             do i = 1, l1
                 ut_arr(j, i) = ut_arr(j, i) * obj%u%inv_s(j)
@@ -925,9 +908,11 @@ module sparse_ir
         end do
     
         ! ut_arr(ns, l1) * v(n, ns) -> res(l2, n)
-        call dgemm("t", "t", l1, n, ns, one, ut_arr, ns, obj%u%v_real, n, zero, res, l2)
+        res_tmp(:, :) = czero
+        call zgemm("t", "t", l1, n, ns, cone, ut_arr, ns, obj%u%v, n, czero, res_tmp, l2)
     
-        deallocate(ut_arr)
+        res(:, :) = real(res_tmp(:, :), kind(0d0)) 
+        deallocate(ut_arr, arr_tmp, res_tmp)
     end subroutine
     
     subroutine fit_matsubara_f_zz(obj, arr, res)

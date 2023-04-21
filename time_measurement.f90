@@ -18,7 +18,7 @@ program main
         logical, intent(in) :: positive_only
         integer, intent(in) :: num
         type(IR) :: ir_obj
-        integer, parameter :: ndigit = 10, nlambda = 5
+        integer, parameter :: ndigit = 10, nlambda = 4
         double precision, parameter :: lambda = 1.d1 ** nlambda
         double precision, parameter :: wmax = 1.d0
         double precision :: PI
@@ -38,7 +38,7 @@ program main
         if (preset) then
             ir_obj = mk_ir_preset(nlambda, ndigit, beta, positive_only)
         else
-            open(99, file='ir_nlambda5_ndigit10.dat', status='old')
+            open(99, file='ir_nlambda4_ndigit10.dat', status='old')
             ir_obj = read_ir(99, beta, positive_only)
             close(99)
         end if
@@ -243,7 +243,7 @@ program main
         logical, intent(in) :: positive_only
         integer, intent(in) :: num
         type(IR) :: ir_obj
-        integer, parameter :: ndigit = 10, nlambda = 5
+        integer, parameter :: ndigit = 10, nlambda = 4
         double precision, parameter :: lambda = 1.d1 ** nlambda
         double precision, parameter :: wmax = 1.d0
         double precision :: PI
@@ -263,7 +263,7 @@ program main
         if (preset) then
             ir_obj = mk_ir_preset(nlambda, ndigit, beta, positive_only)
         else
-            open(99, file='ir_nlambda5_ndigit10.dat', status='old')
+            open(99, file='ir_nlambda4_ndigit10.dat', status='old')
             ir_obj = read_ir(99, beta, positive_only)
             close(99)
         end if
