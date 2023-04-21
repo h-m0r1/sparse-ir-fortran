@@ -585,7 +585,7 @@ module sparse_ir
     
         ! v(n, ns) * ut_arr(ns) -> res(n)
         res(:) = czero
-        call zgemv ('n', n, ns, cone, obj%uhat_f%v, ns, ut_arr, 1, czero, ut_arr, 1)
+        call zgemv ('n', n, ns, cone, obj%uhat_f%v, n, ut_arr, 1, czero, res, 1)
     
         deallocate(ut_arr)
     end subroutine
