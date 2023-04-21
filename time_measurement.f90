@@ -3,7 +3,7 @@ program main
     use sparse_ir_io
     use sparse_ir_preset
     implicit none
-    integer, parameter :: num = 1000
+    integer, parameter :: num = 10000000
 
     call time_fermion(.false., .false., num)
     call time_boson  (.false., .false., num)
@@ -78,152 +78,156 @@ program main
             gtau_d(1, t) = - exp(-ir_obj%tau(t) * omega0)/(1.d0 + exp(-beta * omega0))
         end do
 
+        write(*,*) "time_fermion"
+        write(*,*) "preset = ", preset
+        write(*,*) "positive_only = ", positive_only
+
         call system_clock(time_begin_c, CountPerSec, CountMax)
         if (positive_only) then
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call fit_matsubara_f(ir_obj, giv, gl_matsu_d)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (fit_matsubara_f_zd)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call fit_matsubara_f(ir_obj, giv, gl_matsu)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (fit_matsubara_f_zz)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call fit_tau(ir_obj, gtau_d, gl_tau_d)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (fit_tau_dd)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call fit_tau(ir_obj, gtau_d, gl_tau)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (fit_tau_dz)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call fit_tau(ir_obj, gtau, gl_tau_d)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (fit_tau_zd)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call fit_tau(ir_obj, gtau, gl_tau)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (fit_tau_zz)"
-            call sleep(2)
+            call sleep(1)
         
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call evaluate_matsubara_f(ir_obj, gl_matsu_d, giv_reconst)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (evaluate_matsubara_f_dz)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call evaluate_matsubara_f(ir_obj, gl_matsu, giv_reconst)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (evaluate_matsubara_f_zz)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call evaluate_tau(ir_obj, gl_tau_d, gtau_reconst_d)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (evaluate_tau_dd)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call evaluate_tau(ir_obj, gl_tau_d, gtau_reconst)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (evaluate_tau_dz)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call evaluate_tau(ir_obj, gl_tau, gtau_reconst_d)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (evaluate_tau_zd)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call evaluate_tau(ir_obj, gl_tau, gtau_reconst)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (evaluate_tau_zz)"
-            call sleep(2)
+            call sleep(1)
         else
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call fit_matsubara_f(ir_obj, giv, gl_matsu)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (fit_matsubara_f_zz)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call fit_tau(ir_obj, gtau, gl_tau)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (fit_tau_zz)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call evaluate_matsubara_f(ir_obj, gl_matsu, giv_reconst)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (evaluate_matsubara_f_zz)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call evaluate_tau(ir_obj, gl_tau, gtau_reconst)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (evaluate_tau_zz)"
-            call sleep(2)
+            call sleep(1)
         end if
 
         deallocate(giv, gtau, gl_matsu, gl_tau, gtau_reconst, giv_reconst)
@@ -299,152 +303,156 @@ program main
             gtau_d(1, t) = - exp(-ir_obj%tau(t) * omega0)/(1.d0 - exp(-beta * omega0))
         end do
 
+        write(*,*) "time_boson"
+        write(*,*) "preset = ", preset
+        write(*,*) "positive_only = ", positive_only
+
         call system_clock(time_begin_c, CountPerSec, CountMax)
         if (positive_only) then
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call fit_matsubara_b(ir_obj, giv, gl_matsu_d)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (fit_matsubara_b_zd)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call fit_matsubara_b(ir_obj, giv, gl_matsu)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (fit_matsubara_b_zz)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call fit_tau(ir_obj, gtau_d, gl_tau_d)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (fit_tau_dd)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call fit_tau(ir_obj, gtau_d, gl_tau)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (fit_tau_dz)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call fit_tau(ir_obj, gtau, gl_tau_d)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (fit_tau_zd)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call fit_tau(ir_obj, gtau, gl_tau)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (fit_tau_zz)"
-            call sleep(2)
+            call sleep(1)
         
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call evaluate_matsubara_b(ir_obj, gl_matsu_d, giv_reconst)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (evaluate_matsubara_b_dz)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call evaluate_matsubara_b(ir_obj, gl_matsu, giv_reconst)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (evaluate_matsubara_b_zz)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call evaluate_tau(ir_obj, gl_tau_d, gtau_reconst_d)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (evaluate_tau_dd)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call evaluate_tau(ir_obj, gl_tau_d, gtau_reconst)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (evaluate_tau_dz)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call evaluate_tau(ir_obj, gl_tau, gtau_reconst_d)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (evaluate_tau_zd)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call evaluate_tau(ir_obj, gl_tau, gtau_reconst)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (evaluate_tau_zz)"
-            call sleep(2)
+            call sleep(1)
         else
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call fit_matsubara_b(ir_obj, giv, gl_matsu)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (fit_matsubara_b_zz)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call fit_tau(ir_obj, gtau, gl_tau)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (fit_tau_zz)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call evaluate_matsubara_b(ir_obj, gl_matsu, giv_reconst)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (evaluate_matsubara_b_zz)"
-            call sleep(2)
+            call sleep(1)
         
-            call sleep(2)
+            call sleep(1)
             call system_clock(time_begin_c)
             do i = 1, num
                 call evaluate_tau(ir_obj, gl_tau, gtau_reconst)
             end do
             call system_clock(time_end_c)
             write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec (evaluate_tau_zz)"
-            call sleep(2)
+            call sleep(1)
         end if
 
         deallocate(giv, gtau, gl_matsu, gl_tau, gtau_reconst, giv_reconst)
