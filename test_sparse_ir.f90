@@ -487,13 +487,13 @@ program main
             stop 1
         end if
 
-        write(*,*) "test_fermion_dlr"
-        write(*,*) "preset = ", preset
-        write(*,*) "positive_only = ", positive_only
-        write(*,*) "lflag_gtau = ", lflag_gtau
-        write(*,*) "lflag_gl = ", lflag_gl
-        write(*,*) "lflag_gdlr = ", lflag_gdlr
-        write(*,*)
+        !write(*,*) "test_fermion_dlr"
+        !write(*,*) "preset = ", preset
+        !write(*,*) "positive_only = ", positive_only
+        !write(*,*) "lflag_gtau = ", lflag_gtau
+        !write(*,*) "lflag_gl = ", lflag_gl
+        !write(*,*) "lflag_gdlr = ", lflag_gdlr
+        !write(*,*)
 
         deallocate(giv_smpl, gtau_smpl, gl_matsu, gl_tau, gtau_reconst, giv_reconst)
         deallocate(giv_ref, gtau_ref, g_dlr, freq, tau)
@@ -658,13 +658,13 @@ program main
             stop 1
         end if
 
-        write(*,*) "test_boson_dlr"
-        write(*,*) "preset = ", preset
-        write(*,*) "positive_only = ", positive_only
-        write(*,*) "lflag_gtau = ", lflag_gtau
-        write(*,*) "lflag_gl = ", lflag_gl
-        write(*,*) "lflag_gdlr = ", lflag_gdlr
-        write(*,*)
+        !write(*,*) "test_boson_dlr"
+        !write(*,*) "preset = ", preset
+        !write(*,*) "positive_only = ", positive_only
+        !write(*,*) "lflag_gtau = ", lflag_gtau
+        !write(*,*) "lflag_gl = ", lflag_gl
+        !write(*,*) "lflag_gdlr = ", lflag_gdlr
+        !write(*,*)
 
         deallocate(giv_smpl, gtau_smpl, gl_matsu, gl_tau, gtau_reconst, giv_reconst)
         deallocate(giv_ref, gtau_ref, g_dlr, freq, tau)
