@@ -1,0 +1,60 @@
+FC = ifort
+
+#LDLIBS = -L${MKLROOT}/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl
+LDLIBS = -mkl=sequential
+LDFLAGS = -static-intel
+F90FLAGS = -O2 -g -traceback
+
+.SUFFIXES: .f90
+
+%.o: %.f90
+	$(COMPILE.f) $(OUTPUT_OPTION) $< $(F90FLAGS)
+
+%.mod: %.f90 %.o
+	@:
+
+test_sparse_ir.x: test_sparse_ir.o sparse_ir.o sparse_ir_io.o sparse_ir_preset.o
+	$(LINK.f) $^ $(LDLIBS) $(LDFLAGS) -o $@
+
+test_sparse_ir.o: sparse_ir.mod sparse_ir_io.mod sparse_ir_preset.mod
+
+test_sparse_ir1.x: test_sparse_ir1.o sparse_ir1.o sparse_ir_io.o sparse_ir_preset.o
+	$(LINK.f) $^ $(LDLIBS) $(LDFLAGS) -o $@
+
+test_sparse_ir1.o: sparse_ir1.mod sparse_ir_io.mod sparse_ir_preset.mod
+
+test_sparse_ir2.x: test_sparse_ir2.o sparse_ir2.o sparse_ir_io.o sparse_ir_preset.o
+	$(LINK.f) $^ $(LDLIBS) $(LDFLAGS) -o $@
+
+test_sparse_ir2.o: sparse_ir2.mod sparse_ir_io.mod sparse_ir_preset.mod
+
+time_measurement.x: time_measurement.o sparse_ir.o sparse_ir_io.o sparse_ir_preset.o
+	$(LINK.f) $^ $(LDLIBS) $(LDFLAGS) -o $@
+
+time_measurement.o: sparse_ir.mod sparse_ir_io.mod sparse_ir_preset.mod
+
+time_measurement1.x: time_measurement1.o sparse_ir1.o sparse_ir_io.o sparse_ir_preset.o
+	$(LINK.f) $^ $(LDLIBS) $(LDFLAGS) -o $@
+
+time_measurement1.o: sparse_ir1.mod sparse_ir_io.mod sparse_ir_preset.mod
+
+time_measurement2.x: time_measurement2.o sparse_ir2.o sparse_ir_io.o sparse_ir_preset.o
+	$(LINK.f) $^ $(LDLIBS) $(LDFLAGS) -o $@
+
+time_measurement2.o: sparse_ir2.mod sparse_ir_io.mod sparse_ir_preset.mod
+
+.PHONY: test
+test: test_sparse_ir.x test_sparse_ir1.x test_sparse_ir2.x
+	./test_sparse_ir.x
+	./test_sparse_ir1.x
+	./test_sparse_ir2.x
+
+.PHONY: clean
+clean:
+	rm -f *.o *.mod
+
+.PHONY: all
+all: test time_measurement.x time_measurement1.x time_measurement2.x
+	./time_measurement.x
+	./time_measurement1.x
+	./time_measurement2.x
