@@ -51,7 +51,7 @@ test: test_sparse_ir.x test_sparse_ir1.x test_sparse_ir2.x
 
 .PHONY: clean
 clean:
-	rm -f *.o *.mod
+	rm -f *.o *.mod *.x
 
 .PHONY: all
 all: test time_measurement.x time_measurement1.x time_measurement2.x

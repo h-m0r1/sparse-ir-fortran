@@ -27,7 +27,7 @@ module sparse_ir
     end interface fit_tau
 
     interface fit_matsubara_f
-        module procedure fit_matsubara_f_zz, fit_matsubara_f_zd, fit_matsubara_f_zz_1
+        module procedure fit_matsubara_f_zz, fit_matsubara_f_zd
     end interface fit_matsubara_f
 
     interface fit_matsubara_b
@@ -551,44 +551,6 @@ module sparse_ir
             deallocate(work, a_copy, s, u, vt, u_copy)
         endif
     end function
-
-    subroutine fit_matsubara_f_zz_1(obj, arr, res)
-        type(IR), intent(in) :: obj
-        complex(kind(0d0)), intent (in) :: arr(:)
-        complex(kind(0d0)), intent(out) :: res(:)
-        complex(kind(0d0)), allocatable :: ut_arr(:)
-    
-        integer :: m, n, ns, j
-    
-        ! ut(ns, m)
-        ! v(n, ns)
-        ! arr(m)
-        ! mat(m, n)
-        ! ut_arr(ns)
-        ! res(n)
-        m = size(arr)
-        n = size(res)
-        ns = obj%uhat_f%ns
-        IF (m .NE. obj%uhat_f%m) stop 'wrong number of columns of input array.'
-        IF (n .NE. obj%uhat_f%n) stop 'wrong number of columns of output array.'
-        allocate(ut_arr(ns))
-    
-        !ut(ns, m) * arr(m) -> ut_arr(ns)
-        ut_arr(:) = czero
-        call zgemv ('n', ns, m, cone, obj%uhat_f%ut, ns, arr, 1, czero, ut_arr, 1)
-        IF (obj%positive_only) then
-            ut_arr(:) = cmplx(real(ut_arr(:)), zero, kind(0d0))
-        ENDIF
-        do j = 1, ns
-            ut_arr(j) = ut_arr(j) * obj%uhat_f%inv_s(j)
-        end do
-    
-        ! v(n, ns) * ut_arr(ns) -> res(n)
-        res(:) = czero
-        call zgemv ('n', n, ns, cone, obj%uhat_f%v, n, ut_arr, 1, czero, res, 1)
-    
-        deallocate(ut_arr)
-    end subroutine
     
     subroutine evaluate_tau_zz(obj, arr, res)
         type(IR), intent(in) :: obj
