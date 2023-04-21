@@ -34,6 +34,23 @@ module sparse_ir
         module procedure fit_matsubara_b_zz, fit_matsubara_b_zd
     end interface fit_matsubara_b
 
+    interface to_dlr
+        module procedure to_dlr_zz, to_dlr_dd, to_dlr_dz, to_dlr_zd
+    end interface to_dlr
+
+    interface evaluate_tau_from_dlr
+        module procedure evaluate_tau_from_dlr_zz, evaluate_tau_from_dlr_dz, &
+                         evaluate_tau_from_dlr_zd, evaluate_tau_from_dlr_dd
+    end interface evaluate_tau_from_dlr
+
+    interface evaluate_matsubara_f_from_dlr
+        module procedure evaluate_matsubara_f_from_dlr_zz, evaluate_matsubara_f_from_dlr_dz
+    end interface evaluate_matsubara_f_from_dlr
+
+    interface evaluate_matsubara_b_from_dlr
+        module procedure evaluate_matsubara_b_from_dlr_zz, evaluate_matsubara_b_from_dlr_dz
+    end interface evaluate_matsubara_b_from_dlr
+
     ! Matrix decomposed in SVD for fitting
     type DecomposedMatrix_z
         complex(kind(0d0)), allocatable :: a(:, :) ! Original matrix
@@ -1093,6 +1110,518 @@ module sparse_ir
     
         res(:, :) = real(res_tmp(:, :), kind(0d0)) 
         deallocate(ut_arr, res_tmp)
+    end subroutine
+
+    subroutine to_dlr_zz(obj, arr, res)
+        type(IR), intent(in) :: obj
+        complex(kind(0d0)), intent (in) :: arr(:, :)
+        complex(kind(0d0)), intent(out) :: res(:, :)
+        complex(kind(0d0)), allocatable :: ut_arr(:, :)
+    
+        integer :: m, n, l1, l2, ns, i, j
+    
+        ! ut(ns, m)
+        ! v(n, ns)
+        ! arr(l1, m)
+        ! mat(m, n)
+        ! ut_arr(ns, l1)
+        ! res(l1, n)
+        l1 = size(arr, 1)
+        m = size(arr, 2)
+        l2 = size(res, 1)
+        n = size(res, 2)
+        ns = obj%dlr%ns
+        IF (l1 .NE. l2) stop 'wrong number of rows of input array.'
+        IF (m .NE. obj%dlr%m) stop 'wrong number of columns of input array.'
+        IF (n .NE. obj%dlr%n) stop 'wrong number of columns of output array.'
+        allocate(ut_arr(ns, l1))
+    
+        !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
+        ut_arr(:, :) = czero
+        call zgemm("n", "t", ns, l1, m, cone, obj%dlr%ut, ns, arr, l1, czero, ut_arr, ns)
+        do j = 1, ns
+            do i = 1, l1
+                ut_arr(j, i) = ut_arr(j, i) * obj%dlr%inv_s(j)
+            end do
+        end do
+    
+        ! ut_arr(ns, l1) * v(n, ns) -> res(l2, n)
+        res(:, :) = czero
+        call zgemm("t", "t", l1, n, ns, cone, ut_arr, ns, obj%dlr%v, n, czero, res, l2)
+    
+        deallocate(ut_arr)
+    end subroutine
+    
+    subroutine to_dlr_dz(obj, arr, res)
+        type(IR), intent(in) :: obj
+        double precision, intent (in) :: arr(:, :)
+        complex(kind(0d0)), intent(out) :: res(:, :)
+        complex(kind(0d0)), allocatable :: ut_arr(:, :)
+        complex(kind(0d0)), allocatable :: arr_tmp(:, :)
+    
+        integer :: m, n, l1, l2, ns, i, j
+    
+        ! ut(ns, m)
+        ! v(n, ns)
+        ! arr(l1, m)
+        ! mat(m, n)
+        ! ut_arr(ns, l1)
+        ! res(l1, n)
+        l1 = size(arr, 1)
+        m = size(arr, 2)
+        l2 = size(res, 1)
+        n = size(res, 2)
+        ns = obj%dlr%ns
+        IF (l1 .NE. l2) stop 'wrong number of rows of input array.'
+        IF (m .NE. obj%dlr%m) stop 'wrong number of columns of input array.'
+        IF (n .NE. obj%dlr%n) stop 'wrong number of columns of output array.'
+        IF (.not. obj%positive_only) stop 'input array should be a complex array.'
+        allocate(arr_tmp(l1, m))
+        arr_tmp(:, :) = cmplx(arr(:, :), zero, kind(0d0))
+        allocate(ut_arr(ns, l1))
+    
+        !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
+        ut_arr(:, :) = czero
+        call zgemm("n", "t", ns, l1, m, cone, obj%dlr%ut, ns, arr_tmp, l1, czero, ut_arr, ns)
+        do j = 1, ns
+            do i = 1, l1
+                ut_arr(j, i) = ut_arr(j, i) * obj%dlr%inv_s(j)
+            end do
+        end do
+    
+        ! ut_arr(ns, l1) * v(n, ns) -> res(l2, n)
+        res(:, :) = czero
+        call zgemm("t", "t", l1, n, ns, cone, ut_arr, ns, obj%dlr%v, n, czero, res, l2)
+    
+        deallocate(ut_arr, arr_tmp)
+    end subroutine
+    
+    subroutine to_dlr_zd(obj, arr, res)
+        type(IR), intent(in) :: obj
+        complex(kind(0d0)), intent (in) :: arr(:, :)
+        double precision, intent(out) :: res(:, :)
+        complex(kind(0d0)), allocatable :: ut_arr(:, :)
+        complex(kind(0d0)), allocatable :: res_tmp(:, :)
+    
+        integer :: m, n, l1, l2, ns, i, j
+    
+        ! ut(ns, m)
+        ! v(n, ns)
+        ! arr(l1, m)
+        ! mat(m, n)
+        ! ut_arr(ns, l1)
+        ! res(l1, n)
+        l1 = size(arr, 1)
+        m = size(arr, 2)
+        l2 = size(res, 1)
+        n = size(res, 2)
+        ns = obj%dlr%ns
+        IF (l1 .NE. l2) stop 'wrong number of rows of input array.'
+        IF (m .NE. obj%dlr%m) stop 'wrong number of columns of input array.'
+        IF (n .NE. obj%dlr%n) stop 'wrong number of columns of output array.'
+        IF (.not. obj%positive_only) stop 'output array should be a complex array.'
+        allocate(res_tmp(l2, n))
+        allocate(ut_arr(ns, l1))
+    
+        !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
+        ut_arr(:, :) = czero
+        call zgemm("n", "t", ns, l1, m, cone, obj%dlr%ut, ns, arr, l1, czero, ut_arr, ns)
+        do j = 1, ns
+            do i = 1, l1
+                ut_arr(j, i) = ut_arr(j, i) * obj%dlr%inv_s(j)
+            end do
+        end do
+    
+        ! ut_arr(ns, l1) * v(n, ns) -> res(l2, n)
+        res_tmp(:, :) = czero
+        call zgemm("t", "t", l1, n, ns, cone, ut_arr, ns, obj%dlr%v, n, czero, res_tmp, l2)
+    
+        res(:, :) = real(res_tmp(:, :), kind(0d0)) 
+        deallocate(ut_arr, res_tmp)
+    end subroutine
+    
+    subroutine to_dlr_dd(obj, arr, res)
+        type(IR), intent(in) :: obj
+        double precision, intent (in) :: arr(:, :)
+        double precision, intent(out) :: res(:, :)
+        complex(kind(0d0)), allocatable :: ut_arr(:, :)
+        complex(kind(0d0)), allocatable :: arr_tmp(:, :)
+        complex(kind(0d0)), allocatable :: res_tmp(:, :)
+    
+        integer :: m, n, l1, l2, ns, i, j
+    
+        ! ut(ns, m)
+        ! v(n, ns)
+        ! arr(l1, m)
+        ! mat(m, n)
+        ! ut_arr(ns, l1)
+        ! res(l1, n)
+        l1 = size(arr, 1)
+        m = size(arr, 2)
+        l2 = size(res, 1)
+        n = size(res, 2)
+        ns = obj%dlr%ns
+        IF (l1 .NE. l2) stop 'wrong number of rows of input array.'
+        IF (m .NE. obj%dlr%m) stop 'wrong number of columns of input array.'
+        IF (n .NE. obj%dlr%n) stop 'wrong number of columns of output array.'
+        IF (.not. obj%positive_only) stop 'input and output arrays should be complex arrays.'
+        allocate(arr_tmp(l1, m))
+        allocate(res_tmp(l2, n))
+        arr_tmp(:, :) = cmplx(arr(:, :), zero, kind(0d0))
+        allocate(ut_arr(ns, l1))
+    
+        !ut(ns, m) * arr(l1, m) -> ut_arr(ns, l1)
+        ut_arr(:, :) = czero
+        call zgemm("n", "t", ns, l1, m, cone, obj%dlr%ut, ns, arr_tmp, l1, czero, ut_arr, ns)
+        do j = 1, ns
+            do i = 1, l1
+                ut_arr(j, i) = ut_arr(j, i) * obj%dlr%inv_s(j)
+            end do
+        end do
+    
+        ! ut_arr(ns, l1) * v(n, ns) -> res(l2, n)
+        res_tmp(:, :) = czero
+        call zgemm("t", "t", l1, n, ns, cone, ut_arr, ns, obj%dlr%v, n, czero, res_tmp, l2)
+    
+        res(:, :) = real(res_tmp(:, :), kind(0d0)) 
+        deallocate(ut_arr, arr_tmp, res_tmp)
+    end subroutine
+
+    subroutine evaluate_tau_from_dlr_zz(obj, tau, arr, res)
+        type(IR), intent(in) :: obj
+        double precision, intent(in) :: tau(:)
+        complex(kind(0d0)), intent (in) :: arr(:, :)
+        complex(kind(0d0)), intent(out) :: res(:, :)
+        double precision :: kernel
+        integer :: ntau, nt, p, t, l1, l2
+        !
+        ntau = size(tau)
+        nt = size(res, 2)
+        IF (ntau .NE. nt) stop 'wrong number of columns of output array.'
+        l1 = size(arr, 1)
+        l2 = size(res, 1)
+        IF (l1 .NE. l2) stop 'wrong number of rows of output array.'
+        !
+        do t = 1, ntau
+          if ((tau(t) < 0.0d0) .OR. (obj%beta < tau(t))) then
+            stop 'tau must be in [0, beta].'
+          end if
+        end do
+        !
+        res(:, :) = czero
+        !
+        do t = 1, ntau
+            do p = 1, obj%nomega
+                if (obj%omega(p) < 0) then
+                    if ( (obj%beta - tau(t)) * obj%omega(p) < -100.d0) then
+                        kernel = 0.0d0
+                    else if (obj%beta * obj%omega(p) < -30.d0) then
+                        kernel = exp( (obj%beta - tau(t)) * obj%omega(p))
+                    else
+                        kernel = exp( (obj%beta - tau(t)) * obj%omega(p)) / (exp(obj%beta * obj%omega(p)) + 1.0d0) 
+                    end if
+                else
+                    if (tau(t) * obj%omega(p) > 100.d0) then
+                        kernel = 0.0d0
+                    else if (obj%beta * obj%omega(p) > 30.d0) then
+                        kernel = exp(- tau(t) * obj%omega(p))
+                    else
+                        kernel = exp(- tau(t) * obj%omega(p)) / (1.0d0 + exp(- obj%beta * obj%omega(p))) 
+                    end if
+                end if
+                res(:, t) = res(:, t) - kernel * arr(:, p)
+            end do
+        end do
+        !
+    end subroutine
+    
+    subroutine evaluate_tau_from_dlr_dz(obj, tau, arr, res)
+        type(IR), intent(in) :: obj
+        double precision, intent(in) :: tau(:)
+        double precision, intent (in) :: arr(:, :)
+        complex(kind(0d0)), intent(out) :: res(:, :)
+        double precision :: kernel
+        integer :: ntau, nt, p, t, l1, l2
+        !
+        ntau = size(tau)
+        nt = size(res, 2)
+        IF (ntau .NE. nt) stop 'wrong number of columns of output array.'
+        l1 = size(arr, 1)
+        l2 = size(res, 1)
+        IF (l1 .NE. l2) stop 'wrong number of rows of output array.'
+        IF (.not. obj%positive_only) stop 'input array should be a complex array.'
+        !
+        do t = 1, ntau
+          if ((tau(t) < 0.0d0) .OR. (obj%beta < tau(t))) then
+            stop 'tau must be in [0, beta].'
+          end if
+        end do
+        !
+        res(:, :) = czero
+        !
+        do t = 1, ntau
+            do p = 1, obj%nomega
+                if (obj%omega(p) < 0) then
+                    if ( (obj%beta - tau(t)) * obj%omega(p) < -100.d0) then
+                        kernel = 0.0d0
+                    else if (obj%beta * obj%omega(p) < -30.d0) then
+                        kernel = exp( (obj%beta - tau(t)) * obj%omega(p))
+                    else
+                        kernel = exp( (obj%beta - tau(t)) * obj%omega(p)) / (exp(obj%beta * obj%omega(p)) + 1.0d0) 
+                    end if
+                else
+                    if (tau(t) * obj%omega(p) > 100.d0) then
+                        kernel = 0.0d0
+                    else if (obj%beta * obj%omega(p) > 30.d0) then
+                        kernel = exp(- tau(t) * obj%omega(p))
+                    else
+                        kernel = exp(- tau(t) * obj%omega(p)) / (1.0d0 + exp(- obj%beta * obj%omega(p))) 
+                    end if
+                end if
+                res(:, t) = res(:, t) - kernel * arr(:, p)
+            end do
+        end do
+        !
+    end subroutine
+    
+    subroutine evaluate_tau_from_dlr_zd(obj, tau, arr, res)
+        type(IR), intent(in) :: obj
+        double precision, intent(in) :: tau(:)
+        complex(kind(0d0)), intent (in) :: arr(:, :)
+        double precision, intent(out) :: res(:, :)
+        double precision :: kernel
+        integer :: ntau, nt, p, t, l1, l2
+        !
+        ntau = size(tau)
+        nt = size(res, 2)
+        IF (ntau .NE. nt) stop 'wrong number of columns of output array.'
+        l1 = size(arr, 1)
+        l2 = size(res, 1)
+        IF (l1 .NE. l2) stop 'wrong number of rows of output array.'
+        IF (.not. obj%positive_only) stop 'output array should be a complex array.'
+        !
+        do t = 1, ntau
+          if ((tau(t) < 0.0d0) .OR. (obj%beta < tau(t))) then
+            stop 'tau must be in [0, beta].'
+          end if
+        end do
+        !
+        res(:, :) = czero
+        !
+        do t = 1, ntau
+            do p = 1, obj%nomega
+                if (obj%omega(p) < 0) then
+                    if ( (obj%beta - tau(t)) * obj%omega(p) < -100.d0) then
+                        kernel = 0.0d0
+                    else if (obj%beta * obj%omega(p) < -30.d0) then
+                        kernel = exp( (obj%beta - tau(t)) * obj%omega(p))
+                    else
+                        kernel = exp( (obj%beta - tau(t)) * obj%omega(p)) / (exp(obj%beta * obj%omega(p)) + 1.0d0) 
+                    end if
+                else
+                    if (tau(t) * obj%omega(p) > 100.d0) then
+                        kernel = 0.0d0
+                    else if (obj%beta * obj%omega(p) > 30.d0) then
+                        kernel = exp(- tau(t) * obj%omega(p))
+                    else
+                        kernel = exp(- tau(t) * obj%omega(p)) / (1.0d0 + exp(- obj%beta * obj%omega(p))) 
+                    end if
+                end if
+                res(:, t) = res(:, t) - kernel * real(arr(:, p), kind(0d0)))
+            end do
+        end do
+        !
+    end subroutine
+    
+    subroutine evaluate_tau_from_dlr_dd(obj, tau, arr, res)
+        type(IR), intent(in) :: obj
+        double precision, intent(in) :: tau(:)
+        double precision, intent (in) :: arr(:, :)
+        double precision, intent(out) :: res(:, :)
+        double precision :: kernel
+        integer :: ntau, nt, p, t, l1, l2
+        !
+        ntau = size(tau)
+        nt = size(res, 2)
+        IF (ntau .NE. nt) stop 'wrong number of columns of output array.'
+        l1 = size(arr, 1)
+        l2 = size(res, 1)
+        IF (l1 .NE. l2) stop 'wrong number of rows of output array.'
+        IF (.not. obj%positive_only) stop 'input and output arrays should be complex arrays.'
+        !
+        do t = 1, ntau
+          if ((tau(t) < 0.0d0) .OR. (obj%beta < tau(t))) then
+            stop 'tau must be in [0, beta].'
+          end if
+        end do
+        !
+        res(:, :) = czero
+        !
+        do t = 1, ntau
+            do p = 1, obj%nomega
+                if (obj%omega(p) < 0) then
+                    if ( (obj%beta - tau(t)) * obj%omega(p) < -100.d0) then
+                        kernel = 0.0d0
+                    else if (obj%beta * obj%omega(p) < -30.d0) then
+                        kernel = exp( (obj%beta - tau(t)) * obj%omega(p))
+                    else
+                        kernel = exp( (obj%beta - tau(t)) * obj%omega(p)) / (exp(obj%beta * obj%omega(p)) + 1.0d0) 
+                    end if
+                else
+                    if (tau(t) * obj%omega(p) > 100.d0) then
+                        kernel = 0.0d0
+                    else if (obj%beta * obj%omega(p) > 30.d0) then
+                        kernel = exp(- tau(t) * obj%omega(p))
+                    else
+                        kernel = exp(- tau(t) * obj%omega(p)) / (1.0d0 + exp(- obj%beta * obj%omega(p))) 
+                    end if
+                end if
+                res(:, t) = res(:, t) - kernel * arr(:, p)
+            end do
+        end do
+        !
+    end subroutine
+
+    subroutine evaluate_matsubara_f_from_dlr_zz(obj, freq, arr, res)
+        type(IR), intent(in) :: obj
+        integer, intent(in) :: freq(:)
+        complex(kind(0d0)), intent (in) :: arr(:, :)
+        complex(kind(0d0)), intent(out) :: res(:, :)
+        double precision :: PI
+        complex(kind(0d0)) :: cfreq
+        complex(kind(0d0)) :: kernel
+        integer :: nfreq, nf, p, n, l1, l2
+        !
+        PI =4.D0*DATAN(1.D0)
+        !
+        nfreq = size(freq)
+        nf = size(res, 2)
+        IF (nfreq .NE. nf) stop 'wrong number of columns of output array.'
+        l1 = size(arr, 1)
+        l2 = size(res, 1)
+        IF (l1 .NE. l2) stop 'wrong number of rows of output array.'
+        !
+        do n = 1, nfreq
+          if (MOD(freq(n), 2) == 0) stop 'one of input integers is not odd.'
+        end do
+        !
+        res(:, :) = czero
+        !
+        do n = 1, nfreq
+            cfreq = ci * pi * REAL(freq(n), kind(0d0)) / obj%beta
+            do p = 1, obj%nomega
+                kernel = 1.0d0 / (cfreq - obj%omega(p))
+                res(:, n) = res(:, n) + kernel * arr(:, p)
+            end do
+        end do
+        !
+    end subroutine
+    
+    subroutine evaluate_matsubara_f_from_dlr_dz(obj, freq, arr, res)
+        type(IR), intent(in) :: obj
+        integer, intent(in) :: freq(:)
+        double precision, intent (in) :: arr(:, :)
+        complex(kind(0d0)), intent(out) :: res(:, :)
+        double precision :: PI
+        complex(kind(0d0)) :: cfreq
+        complex(kind(0d0)) :: kernel
+        integer :: nfreq, nf, p, n, l1, l2
+        !
+        PI =4.D0*DATAN(1.D0)
+        !
+        nfreq = size(freq)
+        nf = size(res, 2)
+        IF (nfreq .NE. nf) stop 'wrong number of columns of output array.'
+        l1 = size(arr, 1)
+        l2 = size(res, 1)
+        IF (l1 .NE. l2) stop 'wrong number of rows of output array.'
+        IF (.not. obj%positive_only) stop 'input array should be a complex array.'
+        !
+        do n = 1, nfreq
+          if (MOD(freq(n), 2) == 0) stop 'one of input integers is not odd.'
+        end do
+        !
+        res(:, :) = czero
+        !
+        do n = 1, nfreq
+            cfreq = ci * pi * REAL(freq(n), kind(0d0)) / obj%beta
+            do p = 1, obj%nomega
+                kernel = 1.0d0 / (cfreq - obj%omega(p))
+                res(:, n) = res(:, n) + kernel * arr(:, p)
+            end do
+        end do
+        !
+    end subroutine
+    
+    subroutine evaluate_matsubara_b_from_dlr_zz(obj, freq, arr, res)
+        type(IR), intent(in) :: obj
+        integer, intent(in) :: freq(:)
+        complex(kind(0d0)), intent (in) :: arr(:, :)
+        complex(kind(0d0)), intent(out) :: res(:, :)
+        double precision :: PI
+        complex(kind(0d0)) :: cfreq
+        complex(kind(0d0)) :: kernel
+        integer :: nfreq, nf, p, n, l1, l2
+        !
+        PI =4.D0*DATAN(1.D0)
+        !
+        nfreq = size(freq)
+        nf = size(res, 2)
+        IF (nfreq .NE. nf) stop 'wrong number of columns of output array.'
+        l1 = size(arr, 1)
+        l2 = size(res, 1)
+        IF (l1 .NE. l2) stop 'wrong number of rows of output array.'
+        !
+        do n = 1, nfreq
+          if (MOD(freq(n), 2) .ne. 0) stop 'one of input integers is not even.'
+        end do
+        !
+        res(:, :) = czero
+        !
+        do n = 1, nfreq
+            cfreq = ci * pi * REAL(freq(n), kind(0d0)) / obj%beta
+            do p = 1, obj%nomega
+                kernel = TANH(5.0d-1 * obj%beta * obj%omega(p)) / (cfreq - obj%omega(p))
+                res(:, n) = res(:, n) + kernel * arr(:, p)
+            end do
+        end do
+        !
+    end subroutine
+    
+    subroutine evaluate_matsubara_b_from_dlr_dz(obj, freq, arr, res)
+        type(IR), intent(in) :: obj
+        integer, intent(in) :: freq(:)
+        double precision, intent (in) :: arr(:, :)
+        complex(kind(0d0)), intent(out) :: res(:, :)
+        double precision :: PI
+        complex(kind(0d0)) :: cfreq
+        complex(kind(0d0)) :: kernel
+        integer :: nfreq, nf, p, n, l1, l2
+        !
+        PI =4.D0*DATAN(1.D0)
+        !
+        nfreq = size(freq)
+        nf = size(res, 2)
+        IF (nfreq .NE. nf) stop 'wrong number of columns of output array.'
+        l1 = size(arr, 1)
+        l2 = size(res, 1)
+        IF (l1 .NE. l2) stop 'wrong number of rows of output array.'
+        IF (.not. obj%positive_only) stop 'input array should be a complex array.'
+        !
+        do n = 1, nfreq
+          if (MOD(freq(n), 2) .ne. 0) stop 'one of input integers is not even.'
+        end do
+        !
+        res(:, :) = czero
+        !
+        do n = 1, nfreq
+            cfreq = ci * pi * REAL(freq(n), kind(0d0)) / obj%beta
+            do p = 1, obj%nomega
+                kernel = TANH(5.0d-1 * obj%beta * obj%omega(p)) / (cfreq - obj%omega(p))
+                res(:, n) = res(:, n) + kernel * arr(:, p)
+            end do
+        end do
+        !
     end subroutine
 
 end module
