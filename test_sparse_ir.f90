@@ -102,9 +102,7 @@ program main
             !    write(*,*) gl_matsu_d(1,l)
             !    write(*,*) gl_tau_d(1,l)
             !end do
-            write(*,*) maxval(abs(gl_matsu_d - gl_tau_d))
             if (maxval(abs(gl_matsu_d - gl_tau_d)) > 1d2*eps) then
-                write(*,*) maxval(abs(gl_matsu_d - gl_tau_d))
                 write(*,*) "gl_matsu and gl_tau do not match!"
                 stop 1
             end if
@@ -113,7 +111,6 @@ program main
             !    write(*,*) real(gl_matsu(1,l)), aimag(gl_matsu(1,l))
             !    write(*,*) real(gl_tau(1,l)), aimag(gl_tau(1,l))
             !end do
-            write(*,*) maxval(abs(gl_matsu - gl_tau))
             if (maxval(abs(gl_matsu - gl_tau)) > 1d2*eps) then
                 write(*,*) "gl_matsu and gl_tau do not match!"
                 stop 1
@@ -251,9 +248,7 @@ program main
             !    write(*,*) gl_matsu_d(1,l)
             !    write(*,*) gl_tau_d(1,l)
             !end do
-            write(*,*) maxval(abs(gl_matsu_d - gl_tau_d))
             if (maxval(abs(gl_matsu_d - gl_tau_d)) > 1d2*eps) then
-                write(*,*) maxval(abs(gl_matsu_d - gl_tau_d))
                 write(*,*) "gl_matsu and gl_tau do not match!"
                 stop 1
             end if
@@ -262,7 +257,6 @@ program main
             !    write(*,*) real(gl_matsu(1,l)), aimag(gl_matsu(1,l))
             !    write(*,*) real(gl_tau(1,l)), aimag(gl_tau(1,l))
             !end do
-            write(*,*) maxval(abs(gl_matsu - gl_tau))
             if (maxval(abs(gl_matsu - gl_tau)) > 1d2*eps) then
                 write(*,*) "gl_matsu and gl_tau do not match!"
                 stop 1
