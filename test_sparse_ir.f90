@@ -412,13 +412,13 @@ program main
             gtau_smpl_d(1, t) = - exp(-ir_obj%tau(t) * omega0)/(1.d0 + exp(-beta * omega0))
         end do
         if (lflag_gtau .and. lflag_gl) then
-            call fit_tau(ir_obj, gtau_d, gl_tau_d)
+            call fit_tau(ir_obj, gtau_smpl_d, gl_tau_d)
         elseif ((.not. lflag_gtau) .and. lflag_gl) then
-            call fit_tau(ir_obj, gtau, gl_tau_d)
+            call fit_tau(ir_obj, gtau_smpl, gl_tau_d)
         elseif (lflag_gtau .and. (.not. lflag_gl)) then
-            call fit_tau(ir_obj, gtau_d, gl_tau)
+            call fit_tau(ir_obj, gtau_smpl_d, gl_tau)
         else
-            call fit_tau(ir_obj, gtau, gl_tau)
+            call fit_tau(ir_obj, gtau_smpl, gl_tau)
         end if
 
         if (lflag_gl) then
@@ -575,13 +575,13 @@ program main
             gtau_smpl_d(1, t) = - exp(-ir_obj%tau(t) * omega0)/(1.d0 - exp(-beta * omega0))
         end do
         if (lflag_gtau .and. lflag_gl) then
-            call fit_tau(ir_obj, gtau_d, gl_tau_d)
+            call fit_tau(ir_obj, gtau_smpl_d, gl_tau_d)
         elseif ((.not. lflag_gtau) .and. lflag_gl) then
-            call fit_tau(ir_obj, gtau, gl_tau_d)
+            call fit_tau(ir_obj, gtau_smpl, gl_tau_d)
         elseif (lflag_gtau .and. (.not. lflag_gl)) then
-            call fit_tau(ir_obj, gtau_d, gl_tau)
+            call fit_tau(ir_obj, gtau_smpl_d, gl_tau)
         else
-            call fit_tau(ir_obj, gtau, gl_tau)
+            call fit_tau(ir_obj, gtau_smpl, gl_tau)
         end if
 
         if (lflag_gl) then
