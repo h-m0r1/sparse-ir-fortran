@@ -3,7 +3,7 @@ program main
     use sparse_ir_io
     use sparse_ir_preset
     implicit none
-    integer, parameter :: num = 10000000
+    integer, parameter :: num = 5000000
 
     call time_fermion(.false., .false., num)
     call time_boson  (.false., .false., num)
