@@ -566,12 +566,9 @@ module sparse_ir
         ! mat(m, n)
         ! ut_arr(ns)
         ! res(n)
-        l1 = size(arr, 1)
-        m = size(arr, 2)
-        l2 = size(res, 1)
-        n = size(res, 2)
+        m = size(arr)
+        n = size(res)
         ns = obj%uhat_f%ns
-        IF (l1 .NE. l2) stop 'wrong number of rows of input array.'
         IF (m .NE. obj%uhat_f%m) stop 'wrong number of columns of input array.'
         IF (n .NE. obj%uhat_f%n) stop 'wrong number of columns of output array.'
         allocate(ut_arr(ns))
