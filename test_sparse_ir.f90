@@ -473,14 +473,14 @@ program main
 
         if (lflag_gdlr .and. lflag_gtau) then
             call evaluate_tau_from_dlr(ir_obj, tau, g_dlr_d, gtau_reconst_d)
+            gtau_reconst = cmplx(gtau_reconst_d, 0.0d0, kind(0d0))
         elseif ((.not. lflag_gdlr) .and. lflag_gtau) then
             call evaluate_tau_from_dlr(ir_obj, tau, g_dlr, gtau_reconst_d)
+            gtau_reconst = cmplx(gtau_reconst_d, 0.0d0, kind(0d0))
         elseif (lflag_gdlr .and. (.not. lflag_gtau)) then
             call evaluate_tau_from_dlr(ir_obj, tau, g_dlr_d, gtau_reconst)
-            gtau_reconst_d = real(gtau_reconst, kind(0d0))
         else
             call evaluate_tau_from_dlr(ir_obj, tau, g_dlr, gtau_reconst)
-            gtau_reconst_d = real(gtau_reconst, kind(0d0))
         end if
         if (maxval(abs(gtau_ref - gtau_reconst)) > 1d3*eps) then
             write(*,*) "gtau do not match!"
@@ -644,14 +644,14 @@ program main
 
         if (lflag_gdlr .and. lflag_gtau) then
             call evaluate_tau_from_dlr(ir_obj, tau, g_dlr_d, gtau_reconst_d)
+            gtau_reconst = cmplx(gtau_reconst_d, 0.0d0, kind(0d0))
         elseif ((.not. lflag_gdlr) .and. lflag_gtau) then
             call evaluate_tau_from_dlr(ir_obj, tau, g_dlr, gtau_reconst_d)
+            gtau_reconst = cmplx(gtau_reconst_d, 0.0d0, kind(0d0))
         elseif (lflag_gdlr .and. (.not. lflag_gtau)) then
             call evaluate_tau_from_dlr(ir_obj, tau, g_dlr_d, gtau_reconst)
-            gtau_reconst_d = real(gtau_reconst, kind(0d0))
         else
             call evaluate_tau_from_dlr(ir_obj, tau, g_dlr, gtau_reconst)
-            gtau_reconst_d = real(gtau_reconst, kind(0d0))
         end if
         if (maxval(abs(gtau_ref - gtau_reconst)) > 1d3*eps) then
             write(*,*) "gtau do not match!"
