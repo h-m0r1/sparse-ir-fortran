@@ -4,6 +4,7 @@ program main
     use sparse_ir_preset
     implicit none
 
+    call test_fermion1(.false., .false., .false., .false.)
     call test_fermion(.false., .false., .false., .false.)
     call test_boson  (.false., .false., .false., .false.)
     call test_fermion(.false., .true., .false., .false.)
@@ -442,7 +443,7 @@ program main
             stop 1
         end if
 
-        write(*,*) "test_fermion"
+        write(*,*) "test_fermion1"
         write(*,*) "preset = ", preset
         write(*,*) "positive_only = ", positive_only
         write(*,*) "lflag_gtau = ", lflag_gtau
