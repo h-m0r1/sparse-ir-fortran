@@ -88,7 +88,7 @@ module sparse_ir
         double precision, allocatable :: v_data(:,:), dlr_data(:,:)
         type(DecomposedMatrix_d) :: u
         type(DecomposedMatrix_z) :: uhat_f, uhat_b
-        !type(DecomposedMatrix_d) :: dlr
+        type(DecomposedMatrix_d) :: dlr
         logical :: positive_only
     end type
 
@@ -181,7 +181,7 @@ module sparse_ir
             obj%uhat_b = split_decompose(obj%uhat_b_data, .true., obj%eps_svd, .false.)
         end if
 
-        !obj%dlr = decompose(obj%dlr_data, obj%eps_svd, .true.)
+        obj%dlr = decompose(obj%dlr_data, obj%eps_svd, .true.)
 
         ! Here we define basis sets for the input value of beta. 
         call set_beta(obj, beta)
@@ -200,7 +200,7 @@ module sparse_ir
         obj%u%a_real(:, :) = sqrt(2.0d0/beta)*obj%u_data(:, :)
         obj%uhat_f%a(:, :) = sqrt(beta) * obj%uhat_f_data(:, :)
         obj%uhat_b%a(:, :) = sqrt(beta) * obj%uhat_b_data(:, :)
-        !obj%dlr%a(:, :) = sqrt(5.0d-1*beta)*obj%dlr_data(:, :)
+        obj%dlr%a(:, :) = sqrt(5.0d-1*beta)*obj%dlr_data(:, :)
 
         obj%u%a = cmplx(obj%u%a_real, zero, kind(0d0))
         obj%uhat_f%a_real = REAL(obj%uhat_f%a, KIND(0d0))
@@ -215,7 +215,7 @@ module sparse_ir
         obj%u%inv_s(:) = sqrt(5.0d-1*beta) * obj%u%inv_s_dl(:)
         obj%uhat_f%inv_s(:) = (1.0d0 / sqrt(beta)) * obj%uhat_f%inv_s_dl(:)
         obj%uhat_b%inv_s(:) = (1.0d0 / sqrt(beta)) * obj%uhat_b%inv_s_dl(:)
-        !obj%dlr%inv_s(:) = sqrt(2.0d0 / beta) * obj%dlr%inv_s_dl(:)
+        obj%dlr%inv_s(:) = sqrt(2.0d0 / beta) * obj%dlr%inv_s_dl(:)
 
     end subroutine
 
@@ -238,7 +238,7 @@ module sparse_ir
         call finalize_dmat_d(obj%u)
         call finalize_dmat_z(obj%uhat_f)
         call finalize_dmat_z(obj%uhat_b)
-        !call finalize_dmat_d(obj%dlr)
+        call finalize_dmat_d(obj%dlr)
     end subroutine
 
     subroutine finalize_dmat_z(dmat)
