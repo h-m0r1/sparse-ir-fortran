@@ -872,7 +872,7 @@ module sparse_ir
         type(IR), intent(in) :: obj
         double precision, intent (in) :: arr(:, :)
         double precision, intent(out) :: res(:, :)
-        double precision, allocatable :: ut_arr(:, :)
+        complex(kind(0d0)), allocatable :: ut_arr(:, :)
         complex(kind(0d0)), allocatable :: arr_tmp(:, :)
         complex(kind(0d0)), allocatable :: res_tmp(:, :)
     
