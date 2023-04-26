@@ -96,7 +96,7 @@ program main
         sum_of_giv = sum_of_giv + REAL(giv(1, 1), kind(0d0))
         sum_of_giv = sum_of_giv + AIMAG(giv(1, 1))
         sum_of_giv = REAL(num, kind(0d0)) * sum_of_giv
-        write(*,*) "estimated sum_of_giv =", sum_of_giv
+        write(*,*) "estimated sum_of_giv      =", sum_of_giv
 
         if (positive_only) then
             giv(:, :) = czero
