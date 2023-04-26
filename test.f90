@@ -43,7 +43,7 @@ program main
         complex(kind(0d0)),allocatable :: giv(:,:), gl_matsu(:, :), gl_tau(:, :), &
             giv_reconst(:, :), gtau_reconst(:, :)
         double precision,allocatable :: gl_matsu_d(:, :), gl_tau_d(:, :), gtau_reconst_d(:, :)
-        integer :: n, t, l, i, ix
+        integer :: n, t, l, i, ix, n_lowest
         integer :: time_begin_c, time_end_c, CountPerSec, CountMax
         double precision :: sum_of_giv
         complex(kind(0d0)), PARAMETER :: cone  = (1.0d0, 0.0d0)
@@ -87,9 +87,14 @@ program main
         write(*,*) "num =", num
         write(*,*) "lsize_ir =", lsize_ir
 
-        giv(ix, 1) = 1.d0/(cmplx(0d0, PI*ir_obj%freq_f(1)/beta, kind(0d0)) - omega0)
-        sum_of_giv = sum_of_giv + REAL(giv_reconst(1:ix, 1), kind(0d0))
-        sum_of_giv = sum_of_giv + AIMAG(giv_reconst(1:ix, 1))
+        if (positive_only) then
+            n_lowest = ir_obj%nfreq_f / 2 + 1 
+        else
+            n_lowest = 1
+        end if
+        giv(1, 1) = 1.d0/(cmplx(0d0, PI*ir_obj%freq_f(n_lowest)/beta, kind(0d0)) - omega0)
+        sum_of_giv = sum_of_giv + REAL(giv(1, 1), kind(0d0))
+        sum_of_giv = sum_of_giv + AIMAG(giv(1, 1))
         sum_of_giv = REAL(num, kind(0d0)) * sum_of_giv
         write(*,*) "estimated sum_of_giv =", sum_of_giv
 
@@ -123,8 +128,8 @@ program main
                     call evaluate_tau(ir_obj, gl_matsu_d, gtau_reconst_d)
                     call fit_tau(ir_obj, gtau_reconst_d, gl_tau_d)
                     call evaluate_matsubara_f(ir_obj, gl_tau_d, giv_reconst)
-                    sum_of_giv = sum_of_giv + SUM(REAL(giv_reconst(1:ix, 1), kind(0d0)))
-                    sum_of_giv = sum_of_giv + SUM(AIMAG(giv_reconst(1:ix, 1)))
+                    sum_of_giv = sum_of_giv + SUM(REAL(giv_reconst(1:ix, n_lowest), kind(0d0)))
+                    sum_of_giv = sum_of_giv + SUM(AIMAG(giv_reconst(1:ix, n_lowest)))
                     giv(:, :) = czero
                     gl_matsu_d(:, :) = zero
                     gtau_reconst_d(:, :) = zero
@@ -135,8 +140,8 @@ program main
                     call evaluate_tau(ir_obj, gl_matsu, gtau_reconst)
                     call fit_tau(ir_obj, gtau_reconst, gl_tau)
                     call evaluate_matsubara_f(ir_obj, gl_tau, giv_reconst)
-                    sum_of_giv = sum_of_giv + SUM(REAL(giv_reconst(1:ix, 1), kind(0d0)))
-                    sum_of_giv = sum_of_giv + SUM(AIMAG(giv_reconst(1:ix, 1)))
+                    sum_of_giv = sum_of_giv + SUM(REAL(giv_reconst(1:ix, n_lowest), kind(0d0)))
+                    sum_of_giv = sum_of_giv + SUM(AIMAG(giv_reconst(1:ix, n_lowest)))
                     giv(:, :) = czero
                     gl_matsu(:, :) = czero
                     gtau_reconst(:, :) = czero
