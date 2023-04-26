@@ -7,19 +7,23 @@ program main
 
     call test_efficiency_f(.false., .false., num, 1)
     call test_efficiency_f(.false., .false., num, 10)
+    call test_efficiency_f(.false., .false., num, 20)
     call test_efficiency_f(.false., .false., num, 50)
     call test_efficiency_f(.false., .false., num, 100)
     call test_efficiency_f(.false., .false., num, 200)
     call test_efficiency_f(.false., .false., num, 12)
+    call test_efficiency_f(.false., .false., num, 24)
     call test_efficiency_f(.false., .false., num, 60)
     call test_efficiency_f(.false., .false., num, 120)
     !
     call test_efficiency_f(.false., .true., num, 1)
     call test_efficiency_f(.false., .true., num, 10)
+    call test_efficiency_f(.false., .true., num, 20)
     call test_efficiency_f(.false., .true., num, 50)
     call test_efficiency_f(.false., .true., num, 100)
     call test_efficiency_f(.false., .true., num, 200)
     call test_efficiency_f(.false., .true., num, 12)
+    call test_efficiency_f(.false., .true., num, 24)
     call test_efficiency_f(.false., .true., num, 60)
     call test_efficiency_f(.false., .true., num, 120)
 
