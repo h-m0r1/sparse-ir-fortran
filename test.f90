@@ -3,7 +3,7 @@ program main
     use sparse_ir_io
     use sparse_ir_preset
     implicit none
-    integer, parameter :: num = 10000000
+    integer, parameter :: num = 5000000
 
     call test_efficiency_f(.false., .false., num, 1)
     call test_efficiency_f(.false., .false., num, 10)
@@ -81,11 +81,6 @@ program main
         allocate(gtau_reconst_d(lsize_ir, ir_obj%ntau))
         sum_of_giv = zero
 
-        ! From Matsubara
-        do n = 1, ir_obj%nfreq_f
-            giv(1, n) = 1.d0/(cmplx(0d0, PI*ir_obj%freq_f(n)/beta, kind(0d0)) - omega0)
-        end do
-
         write(*,*) "test_efficiency_f"
         write(*,*) "preset = ", preset
         write(*,*) "positive_only = ", positive_only
@@ -96,7 +91,9 @@ program main
         call system_clock(time_begin_c)
         do i = 1, num
             ix = MOD(i - 1, lsize_ir) + 1
-            giv(ix, n) = 1.d0/(cmplx(0d0, PI*ir_obj%freq_f(n)/beta, kind(0d0)) - omega0)
+            do n = 1, ir_obj%nfreq_f
+                giv(ix, n) = 1.d0/(cmplx(0d0, PI*ir_obj%freq_f(n)/beta, kind(0d0)) - omega0)
+            end do
             if ((ix == lsize_ir) .OR. (i == num)) THEN
                 if (positive_only) then
                     call fit_matsubara_f(ir_obj, giv, gl_matsu_d)
