@@ -26,7 +26,7 @@ program main
     contains
 
     ! fermion
-    subroutine test_efficiency_f(preset, positive_only, lsize_ir)
+    subroutine test_efficiency_f(preset, positive_only, num, lsize_ir)
         logical, intent(in) :: preset
         logical, intent(in) :: positive_only
         integer, intent(in) :: num
