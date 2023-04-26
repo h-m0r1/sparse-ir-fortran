@@ -88,9 +88,9 @@ program main
         write(*,*) "lsize_ir =", lsize_ir
 
         if (positive_only) then
-            n_lowest = ir_obj%nfreq_f / 2 + 1 
-        else
             n_lowest = 1
+        else
+            n_lowest = ir_obj%nfreq_f / 2 + 1 
         end if
         giv(1, 1) = 1.d0/(cmplx(0d0, PI*ir_obj%freq_f(n_lowest)/beta, kind(0d0)) - omega0)
         sum_of_giv = sum_of_giv + REAL(giv(1, 1), kind(0d0))
