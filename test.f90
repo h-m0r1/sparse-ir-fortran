@@ -45,6 +45,7 @@ program main
         double precision,allocatable :: gl_matsu_d(:, :), gl_tau_d(:, :), gtau_reconst_d(:, :)
         integer :: n, t, l, i, ix
         integer :: time_begin_c, time_end_c, CountPerSec, CountMax
+        double precision :: sum
         complex(kind(0d0)), PARAMETER :: cone  = (1.0d0, 0.0d0)
         complex(kind(0d0)), PARAMETER :: ci  = (0.0d0, 1.0d0)
         complex(kind(0d0)), PARAMETER :: czero  = (0.0d0, 0.0d0)
