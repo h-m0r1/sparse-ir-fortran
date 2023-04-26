@@ -43,6 +43,21 @@ time_measurement2.x: time_measurement2.o sparse_ir2.o sparse_ir_io.o sparse_ir_p
 
 time_measurement2.o: sparse_ir2.mod sparse_ir_io.mod sparse_ir_preset.mod
 
+test.x: test.o sparse_ir.o sparse_ir_io.o sparse_ir_preset.o
+	$(LINK.f) $^ $(LDLIBS) $(LDFLAGS) -o $@
+
+test.o: sparse_ir.mod sparse_ir_io.mod sparse_ir_preset.mod
+
+test1.x: test1.o sparse_ir1.o sparse_ir_io.o sparse_ir_preset.o
+	$(LINK.f) $^ $(LDLIBS) $(LDFLAGS) -o $@
+
+test1.o: sparse_ir1.mod sparse_ir_io.mod sparse_ir_preset.mod
+
+test2.x: test2.o sparse_ir2.o sparse_ir_io.o sparse_ir_preset.o
+	$(LINK.f) $^ $(LDLIBS) $(LDFLAGS) -o $@
+
+test2.o: sparse_ir2.mod sparse_ir_io.mod sparse_ir_preset.mod
+
 .PHONY: test
 test: test_sparse_ir.x test_sparse_ir1.x test_sparse_ir2.x
 	./test_sparse_ir.x
@@ -58,3 +73,9 @@ all: test time_measurement.x time_measurement1.x time_measurement2.x
 	./time_measurement.x
 	./time_measurement1.x
 	./time_measurement2.x
+
+.PHONY: effi
+effi: test test.x test1.x test2.x
+	./test.x
+	./test1.x
+	./test2.x
