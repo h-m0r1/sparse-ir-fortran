@@ -84,6 +84,8 @@ program main
         write(*,*) "test_efficiency_f"
         write(*,*) "preset = ", preset
         write(*,*) "positive_only = ", positive_only
+        write(*,*) "num =", num
+        write(*,*) "lsize_ir =", lsize_ir
 
         call system_clock(time_begin_c, CountPerSec, CountMax)
         call sleep(1)
