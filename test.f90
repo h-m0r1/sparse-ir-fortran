@@ -45,7 +45,7 @@ program main
         double precision,allocatable :: gl_matsu_d(:, :), gl_tau_d(:, :), gtau_reconst_d(:, :)
         integer :: n, t, l, i, ix
         integer :: time_begin_c, time_end_c, CountPerSec, CountMax
-        double precision :: sum
+        double precision :: sum_of_giv
         complex(kind(0d0)), PARAMETER :: cone  = (1.0d0, 0.0d0)
         complex(kind(0d0)), PARAMETER :: ci  = (0.0d0, 1.0d0)
         complex(kind(0d0)), PARAMETER :: czero  = (0.0d0, 0.0d0)
@@ -79,6 +79,7 @@ program main
         allocate(gl_matsu_d(lsize_ir, ir_obj%size))
         allocate(gl_tau_d(lsize_ir, ir_obj%size))
         allocate(gtau_reconst_d(lsize_ir, ir_obj%ntau))
+        sum_of_giv = zero
 
         ! From Matsubara
         do n = 1, ir_obj%nfreq_f
@@ -102,7 +103,7 @@ program main
                     call evaluate_tau(ir_obj, gl_matsu_d, gtau_reconst_d)
                     call fit_tau(ir_obj, gtau_reconst_d, gl_tau_d)
                     call evaluate_matsubara_f(ir_obj, gl_tau_d, giv_reconst)
-                    sum = sum + SUM(REAL(giv_reconst(1:ix, 1)))
+                    sum_of_giv = sum_of_giv + SUM(REAL(giv_reconst(1:ix, 1)))
                     giv(:, :) = czero
                     gl_matsu_d(:, :) = zero
                     gtau_reconst_d(:, :) = zero
@@ -113,7 +114,7 @@ program main
                     call evaluate_tau(ir_obj, gl_matsu, gtau_reconst)
                     call fit_tau(ir_obj, gtau_reconst, gl_tau)
                     call evaluate_matsubara_f(ir_obj, gl_tau, giv_reconst)
-                    sum = sum + SUM(REAL(giv_reconst(1:ix, 1)))
+                    sum_of_giv = sum_of_giv + SUM(REAL(giv_reconst(1:ix, 1)))
                     giv(:, :) = czero
                     gl_matsu(:, :) = czero
                     gtau_reconst(:, :) = czero
@@ -123,7 +124,7 @@ program main
             end if
         end do
         call system_clock(time_end_c)
-        write(*,*) "sum =", sum
+        write(*,*) "sum_of_giv =", sum_of_giv
         write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec"
         call sleep(1)
 
@@ -132,3 +133,5 @@ program main
 
         call finalize_ir(ir_obj)
     end subroutine
+
+end program
