@@ -87,6 +87,27 @@ program main
         write(*,*) "num =", num
         write(*,*) "lsize_ir =", lsize_ir
 
+        giv(ix, 1) = 1.d0/(cmplx(0d0, PI*ir_obj%freq_f(1)/beta, kind(0d0)) - omega0)
+        sum_of_giv = sum_of_giv + REAL(giv_reconst(1:ix, 1), kind(0d0))
+        sum_of_giv = sum_of_giv + AIMAG(giv_reconst(1:ix, 1))
+        sum_of_giv = REAL(num, kind(0d0)) * sum_of_giv
+        write(*,*) "estimated sum_of_giv =", sum_of_giv
+
+        if (positive_only) then
+            giv(:, :) = czero
+            gl_matsu_d(:, :) = zero
+            gtau_reconst_d(:, :) = zero
+            gl_tau_d(:, :) = zero
+            giv_reconst(:, :) = czero
+        else
+            giv(:, :) = czero
+            gl_matsu(:, :) = czero
+            gtau_reconst(:, :) = czero
+            gl_tau(:, :) = czero
+            giv_reconst(:, :) = czero
+        end if
+        sum_of_giv = zero
+
         call system_clock(time_begin_c, CountPerSec, CountMax)
         call sleep(1)
 
@@ -102,7 +123,8 @@ program main
                     call evaluate_tau(ir_obj, gl_matsu_d, gtau_reconst_d)
                     call fit_tau(ir_obj, gtau_reconst_d, gl_tau_d)
                     call evaluate_matsubara_f(ir_obj, gl_tau_d, giv_reconst)
-                    sum_of_giv = sum_of_giv + SUM(REAL(giv_reconst(1:ix, 1)))
+                    sum_of_giv = sum_of_giv + SUM(REAL(giv_reconst(1:ix, 1), kind(0d0)))
+                    sum_of_giv = sum_of_giv + SUM(AIMAG(giv_reconst(1:ix, 1)))
                     giv(:, :) = czero
                     gl_matsu_d(:, :) = zero
                     gtau_reconst_d(:, :) = zero
@@ -113,7 +135,8 @@ program main
                     call evaluate_tau(ir_obj, gl_matsu, gtau_reconst)
                     call fit_tau(ir_obj, gtau_reconst, gl_tau)
                     call evaluate_matsubara_f(ir_obj, gl_tau, giv_reconst)
-                    sum_of_giv = sum_of_giv + SUM(REAL(giv_reconst(1:ix, 1)))
+                    sum_of_giv = sum_of_giv + SUM(REAL(giv_reconst(1:ix, 1), kind(0d0)))
+                    sum_of_giv = sum_of_giv + SUM(AIMAG(giv_reconst(1:ix, 1)))
                     giv(:, :) = czero
                     gl_matsu(:, :) = czero
                     gtau_reconst(:, :) = czero
@@ -123,7 +146,7 @@ program main
             end if
         end do
         call system_clock(time_end_c)
-        write(*,*) "sum_of_giv =", sum_of_giv
+        write(*,*) "test result of sum_of_giv =", sum_of_giv
         write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec"
         call sleep(1)
 
