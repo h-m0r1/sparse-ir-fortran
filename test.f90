@@ -42,9 +42,9 @@ program main
 
         complex(kind(0d0)),allocatable :: giv(:,:), gl_matsu(:, :), gl_tau(:, :), gtau(:, :), &
             giv_reconst(:, :)
-        double precision,allocatable :: gl_matsu_d(:, :), gl_tau_d(:, :), gtau_d(:, :), &
-        integer n, t, l, i, ix
-        integer:: time_begin_c, time_end_c, CountPerSec, CountMax
+        double precision,allocatable :: gl_matsu_d(:, :), gl_tau_d(:, :), gtau_d(:, :)
+        integer :: n, t, l, i, ix
+        integer :: time_begin_c, time_end_c, CountPerSec, CountMax
         complex(kind(0d0)), PARAMETER :: cone  = (1.0d0, 0.0d0)
         complex(kind(0d0)), PARAMETER :: ci  = (0.0d0, 1.0d0)
         complex(kind(0d0)), PARAMETER :: czero  = (0.0d0, 0.0d0)
