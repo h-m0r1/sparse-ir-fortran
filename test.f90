@@ -40,9 +40,9 @@ program main
         double precision, parameter :: beta = lambda/wmax, omega0 = 1.d0/beta
         double precision, parameter :: eps = 1.d-1**ndigit
 
-        complex(kind(0d0)),allocatable :: giv(:,:), gl_matsu(:, :), gl_tau(:, :), gtau(:, :), &
-            giv_reconst(:, :)
-        double precision,allocatable :: gl_matsu_d(:, :), gl_tau_d(:, :), gtau_d(:, :)
+        complex(kind(0d0)),allocatable :: giv(:,:), gl_matsu(:, :), gl_tau(:, :), &
+            giv_reconst(:, :), gtau_reconst(:, :)
+        double precision,allocatable :: gl_matsu_d(:, :), gl_tau_d(:, :), gtau_reconst_d(:, :)
         integer :: n, t, l, i, ix
         integer :: time_begin_c, time_end_c, CountPerSec, CountMax
         complex(kind(0d0)), PARAMETER :: cone  = (1.0d0, 0.0d0)
@@ -70,14 +70,14 @@ program main
             stop 1
         end if
 
-        allocate(giv(1, ir_obj%nfreq_f))
-        allocate(giv_reconst(1, ir_obj%nfreq_f))
-        allocate(gl_matsu(1, ir_obj%size))
-        allocate(gl_tau(1, ir_obj%size))
-        allocate(gtau_reconst(1, ir_obj%ntau))
-        allocate(gl_matsu_d(1, ir_obj%size))
-        allocate(gl_tau_d(1, ir_obj%size))
-        allocate(gtau_reconst_d(1, ir_obj%ntau))
+        allocate(giv(lsize_ir, ir_obj%nfreq_f))
+        allocate(giv_reconst(lsize_ir, ir_obj%nfreq_f))
+        allocate(gl_matsu(lsize_ir, ir_obj%size))
+        allocate(gl_tau(lsize_ir, ir_obj%size))
+        allocate(gtau_reconst(lsize_ir, ir_obj%ntau))
+        allocate(gl_matsu_d(lsize_ir, ir_obj%size))
+        allocate(gl_tau_d(lsize_ir, ir_obj%size))
+        allocate(gtau_reconst_d(lsize_ir, ir_obj%ntau))
 
         ! From Matsubara
         do n = 1, ir_obj%nfreq_f
@@ -126,8 +126,8 @@ program main
         write(*,*) real(time_end_c - time_begin_c)/CountPerSec," sec"
         call sleep(1)
 
-        deallocate(giv, gtau, gl_matsu, gl_tau, gtau_reconst, giv_reconst)
-        deallocate(gtau_d, gl_matsu_d, gl_tau_d, gtau_reconst_d)
+        deallocate(giv, gl_matsu, gl_tau, gtau_reconst, giv_reconst)
+        deallocate(gl_matsu_d, gl_tau_d, gtau_reconst_d)
 
         call finalize_ir(ir_obj)
     end subroutine
